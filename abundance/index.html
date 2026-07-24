@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abundance for All — TradingView Indicator</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #fff; font-family: 'Helvetica Neue', sans-serif; }
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: radial-gradient(ellipse at center, #1a1200 0%, #0a0a0a 70%); }
+.badge { background: rgba(212,175,55,0.15); border: 1px solid #d4af37; color: #d4af37; padding: 6px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+h1 { font-size: clamp(32px, 6vw, 64px); font-weight: 700; line-height: 1.1; margin-bottom: 16px; background: linear-gradient(135deg, #d4af37, #fff, #d4af37); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { font-size: 18px; color: #999; max-width: 500px; margin-bottom: 48px; line-height: 1.6; }
+.cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+.card { background: #111; border: 1px solid #222; border-radius: 16px; padding: 32px; width: 240px; }
+.card.featured { border-color: #d4af37; background: rgba(212,175,55,0.05); }
+.plan { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+.price { font-size: 48px; font-weight: 700; color: #d4af37; margin-bottom: 4px; }
+.period { font-size: 14px; color: #666; margin-bottom: 24px; }
+.features { list-style: none; margin-bottom: 28px; }
+.features li { color: #ccc; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
+.features li:before { content: "✓ "; color: #d4af37; }
+.btn { display: block; padding: 14px; background: #d4af37; color: #000; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; }
+.btn.outline { background: transparent; border: 1px solid #d4af37; color: #d4af37; }
+.telegram-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: #229ED9; color: white; border-radius: 10px; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="badge">TradingView Indicator</div>
+  <h1>Abundance for All</h1>
+  <p class="subtitle">CCI/RSI divergence signals — precision entries, real-time alerts, proven strategy</p>
+  <div class="cards">
+    <div class="card">
+      <div class="plan">Monthly</div>
+      <div class="price">$15</div>
+      <div class="period">per month</div>
+      <ul class="features">
+        <li>Full indicator access</li>
+        <li>TradingView alerts</li>
+        <li>Community access</li>
+      </ul>
+      <a href="https://whop.com/abundance-for-all/" class="btn outline">Get Access</a>
+    </div>
+    <div class="card featured">
+      <div class="plan">⭐ Best Value</div>
+      <div class="price">$49</div>
+      <div class="period">per year</div>
+      <ul class="features">
+        <li>Full indicator access</li>
+        <li>TradingView alerts</li>
+        <li>Priority support</li>
+        <li>Strategy guides</li>
+      </ul>
+      <a href="https://whop.com/abundance-for-all/" class="btn">Get Access</a>
+    </div>
+  </div>
+  <a href="https://t.me/abundanceforall" class="telegram-btn">📢 Join Telegram Community</a>
+</div>
+</body>
+</html>
