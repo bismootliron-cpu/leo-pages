@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes OS — כניסה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080f;
+  --surface: #0e0e1a;
+  --border: #1a1a2e;
+  --accent: #6c63ff;
+  --cyan: #00e5cc;
+  --amber: #ffb020;
+  --text: #e8e8f5;
+  --muted: #5a5a7a;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.login-box {
+  position: relative;
+  z-index: 10;
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: 0 0 80px rgba(108, 99, 255, 0.12);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.brand-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.brand-sub {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.node-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  animation: spin 8s linear infinite;
+}
+
+.node-ring::before {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 229, 204, 0.4);
+  animation: spin 4s linear infinite reverse;
+}
+
+.node-ring::after {
+  content: '⬡';
+  font-size: 24px;
+  color: var(--cyan);
+  animation: spin 8s linear infinite reverse;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+
+.field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.err {
+  font-size: 12px;
+  color: #ff4d6d;
+  text-align: center;
+  margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 18px;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.status-text {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="login-box">
+  <div class="brand">
+    <div class="node-ring"></div>
+    <div class="brand-name">HERMES OS</div>
+    <div class="brand-sub">מרכז שליטה — גישה מוגבלת</div>
+  </div>
+
+  <div class="field">
+    <label>סיסמה</label>
+    <input type="password" id="pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+  </div>
+
+  <button class="btn" onclick="login()">כניסה למערכת</button>
+  <div class="err" id="err"></div>
+
+  <div class="status-bar">
+    <div class="dot"></div>
+    <div class="status-text" id="statusText">בודק חיבור...</div>
+  </div>
+</div>
+
+<script>
+// Animated background
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const nodes = Array.from({length: 30}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  vx: (Math.random() - 0.5) * 0.3,
+  vy: (Math.random() - 0.5) * 0.3,
+  r: Math.random() * 2 + 1
+}));
+
+function drawBg() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = '#6c63ff';
+    ctx.fill();
+  });
+  nodes.forEach((a, i) => nodes.slice(i+1).forEach(b => {
+    const d = Math.hypot(a.x-b.x, a.y-b.y);
+    if (d < 120) {
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = `rgba(108,99,255,${0.15 * (1 - d/120)})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  }));
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+// Auth
+const PASS = 'hermes2026';
+
+function login() {
+  const val = document.getElementById('pass').value;
+  if (val === PASS) {
+    sessionStorage.setItem('hm_auth', '1');
+    window.location.href = 'dashboard.html';
+  } else {
+    document.getElementById('err').textContent = 'סיסמה שגויה';
+    document.getElementById('pass').style.borderColor = '#ff4d6d';
+    setTimeout(() => {
+      document.getElementById('pass').style.borderColor = '';
+      document.getElementById('err').textContent = '';
+    }, 2000);
+  }
+}
+
+// Check Hermes status
+const HERMES_URL = localStorage.getItem('hermes_url') || '';
+if (HERMES_URL) {
+  fetch(HERMES_URL + '/health').then(r => r.json()).then(d => {
+    document.getElementById('statusText').textContent = 'Hermes פעיל ✓';
+  }).catch(() => {
+    document.getElementById('statusText').textContent = 'Hermes לא מחובר';
+  });
+} else {
+  document.getElementById('statusText').textContent = 'הגדר URL של Hermes בהגדרות';
+}
+</script>
+</body>
+</html>
