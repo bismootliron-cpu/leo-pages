@@ -6,50 +6,82 @@
 <title>Abundance for All — TradingView Indicator</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0a0a0a; color: #fff; font-family: 'Helvetica Neue', sans-serif; }
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; background: radial-gradient(ellipse at center, #1a1200 0%, #0a0a0a 70%); }
-.badge { background: rgba(212,175,55,0.15); border: 1px solid #d4af37; color: #d4af37; padding: 6px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
-h1 { font-size: clamp(32px, 6vw, 64px); font-weight: 700; line-height: 1.1; margin-bottom: 16px; background: linear-gradient(135deg, #d4af37, #fff, #d4af37); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.subtitle { font-size: 18px; color: #999; max-width: 500px; margin-bottom: 48px; line-height: 1.6; }
-.cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
-.card { background: #111; border: 1px solid #222; border-radius: 16px; padding: 32px; width: 240px; }
-.card.featured { border-color: #d4af37; background: rgba(212,175,55,0.05); }
-.plan { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-.price { font-size: 48px; font-weight: 700; color: #d4af37; margin-bottom: 4px; }
-.period { font-size: 14px; color: #666; margin-bottom: 24px; }
-.trial-note { font-size: 12px; color: #d4af37; margin-bottom: 16px; margin-top: -16px; }
-.then-price { font-size: 13px; color: #888; margin-bottom: 20px; margin-top: -18px; }
-.features { list-style: none; margin-bottom: 28px; }
-.features li { color: #ccc; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
-.features li:before { content: "✓ "; color: #d4af37; }
-.btn { display: block; padding: 14px; background: #d4af37; color: #000; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; }
-.btn.outline { background: transparent; border: 1px solid #d4af37; color: #d4af37; }
-.cancel-note { font-size: 12px; color: #666; margin-top: 10px; }
-.telegram-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: #229ED9; color: white; border-radius: 10px; text-decoration: none; font-weight: 600; }
-.pricing-note { font-size: 13px; color: #888; margin-top: 12px; margin-bottom: 24px; }
-</style>
-</head>
-<body>
-<div class="hero">
-  <div class="badge">TradingView Indicator</div>
-  <h1>Abundance for All</h1>
-  <p class="subtitle">Precision entries, real-time alerts, proven strategy</p>
-  <div class="cards">
-    <div class="card featured">
-      <div class="plan">First 3 months</div>
-      <div class="price">$15</div>
-      <div class="period">per month</div>
-      <div class="then-price">then $49/mo after</div>
-      <ul class="features">
-        <li>Full indicator access</li>
-        <li>TradingView alerts</li>
-        <li>Community access</li>
-      </ul>
-      <a href="https://whop.com/abundance-for-all/" class="btn">Start 3-Day Free Trial</a>
-      <div class="cancel-note">Cancel anytime</div>
-    </div>
-  </div>
-  <a href="https://t.me/+BXiJXgDCL1I2ZGJk" class="telegram-btn">📢 Join Telegram Community</a>
-</div>
-</body>
-</html>
+body { background: #0a0f0a; color: #fff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+
+/* NAV */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 1px solid #1a2a1a; background: #0a0f0a; }
+.nav-logo { font-size: 18px; font-weight: 700; color: #00e676; letter-spacing: 1px; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { color: #aaa; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+.nav-links a:hover { color: #00e676; }
+.nav-cta { background: #00e676; color: #000; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; }
+
+/* HERO */
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 48px; padding: 80px 48px 60px; min-height: calc(100vh - 65px); max-width: 1280px; margin: 0 auto; }
+.hero-left { flex: 1; max-width: 540px; }
+.hero-badge { display: inline-block; background: rgba(0,230,118,0.1); border: 1px solid #00e676; color: #00e676; padding: 5px 14px; border-radius: 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
+.hero-left h1 { font-size: clamp(32px, 4.5vw, 54px); font-weight: 800; line-height: 1.1; margin-bottom: 20px; color: #fff; }
+.hero-left h1 span { color: #00e676; }
+.hero-left .subtitle { font-size: 17px; color: #8a9a8a; line-height: 1.7; margin-bottom: 40px; max-width: 460px; }
+.feature-list { list-style: none; margin-bottom: 44px; display: flex; flex-direction: column; gap: 18px; }
+.feature-list li { display: flex; align-items: flex-start; gap: 14px; }
+.feature-icon { font-size: 20px; margin-top: 1px; flex-shrink: 0; }
+.feature-text strong { display: block; color: #fff; font-size: 15px; margin-bottom: 3px; }
+.feature-text span { color: #7a8a7a; font-size: 13px; }
+.hero-btns { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.btn-primary { background: #00e676; color: #000; padding: 15px 30px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; display: inline-block; }
+.btn-secondary { background: transparent; border: 1px solid #2a3a2a; color: #aaa; padding: 15px 24px; border-radius: 10px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn-secondary:hover { border-color: #00e676; color: #00e676; }
+
+/* CHART PANEL */
+.hero-right { flex: 1; max-width: 620px; position: relative; }
+.chart-panel { background: #0d1a0d; border: 1px solid #1e3a1e; border-radius: 16px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,0.08); }
+.chart-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1e3a1e; background: #0b150b; }
+.chart-ticker { display: flex; align-items: center; gap: 10px; }
+.ticker-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; }
+.ticker-name { font-size: 14px; font-weight: 700; color: #fff; }
+.ticker-tf { font-size: 12px; color: #555; background: #1a2a1a; padding: 3px 8px; border-radius: 5px; }
+.chart-price { font-size: 14px; color: #00e676; font-weight: 600; }
+.chart-body { position: relative; background: #0d1a0d; height: 360px; overflow: hidden; }
+
+/* SVG CHART */
+.chart-svg { width: 100%; height: 100%; }
+
+/* Chart annotations */
+.signal-badge { position: absolute; padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+.signal-short { background: rgba(255,59,59,0.15); border: 1px solid #ff3b3b; color: #ff6b6b; top: 28px; left: 38%; }
+.signal-long { background: rgba(0,230,118,0.15); border: 1px solid #00e676; color: #00e676; top: 62%; left: 28%; }
+.signal-early { background: rgba(255,184,0,0.15); border: 1px solid #ffb800; color: #ffb800; top: 50%; right: 16%; }
+.target-badge { position: absolute; bottom: 20px; right: 16px; background: linear-gradient(135deg, #00e676, #00c853); color: #000; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 4px 20px rgba(0,230,118,0.4); }
+.chart-years { position: absolute; bottom: 6px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px; font-size: 10px; color: #444; }
+.chart-prices { position: absolute; top: 0; bottom: 30px; right: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 8px; font-size: 10px; color: #444; }
+
+/* STATS BAR */
+.stats-bar { background: #0b150b; border-top: 1px solid #1a2a1a; border-bottom: 1px solid #1a2a1a; padding: 22px 48px; display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+.stat-item { display: flex; align-items: center; gap: 10px; padding: 0 36px; border-right: 1px solid #1a2a1a; }
+.stat-item:last-child { border-right: none; }
+.stat-icon { font-size: 20px; }
+.stat-text strong { display: block; font-size: 15px; color: #fff; font-weight: 700; }
+.stat-text span { font-size: 11px; color: #556655; text-transform: uppercase; letter-spacing: 1px; }
+
+/* PRICING SECTION */
+.pricing-section { padding: 80px 48px; display: flex; flex-direction: column; align-items: center; max-width: 1280px; margin: 0 auto; }
+.section-label { font-size: 11px; color: #00e676; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: #fff; text-align: center; margin-bottom: 10px; }
+.section-sub { font-size: 16px; color: #6a7a6a; text-align: center; margin-bottom: 48px; }
+.pricing-card { background: #0d1a0d; border: 1px solid #1e3a1e; border-radius: 20px; padding: 44px 40px; width: 100%; max-width: 420px; position: relative; box-shadow: 0 0 40px rgba(0,230,118,0.06); }
+.pricing-card::before { content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 1px; background: linear-gradient(135deg, #00e676, transparent, #00e676); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.plan-badge { display: inline-block; background: rgba(0,230,118,0.12); border: 1px solid #00e676; color: #00e676; padding: 4px 14px; border-radius: 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+.price-row { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 4px; }
+.price-amount { font-size: 60px; font-weight: 800; color: #00e676; line-height: 1; }
+.price-mo { font-size: 18px; color: #4a5a4a; align-self: flex-end; padding-bottom: 6px; }
+.then-price { font-size: 13px; color: #4a5a4a; margin-bottom: 28px; }
+.pricing-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+.pricing-features li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #ccc; }
+.check { color: #00e676; font-size: 16px; font-weight: 700; }
+.pricing-features a { color: #ccc; text-decoration: none; }
+.pricing-features a:hover { color: #00e676; }
+.join-btn { display: block; width: 100%; padding: 17px; background: #00e676; color: #000; border-radius: 12px; text-align: center; font-weight: 800; font-size: 17px; text-decoration: none; margin-bottom: 12px; letter-spacing: 0.5px; transition: background 0.2s; }
+.join-btn:hover { background: #00c853; }
+.trial-note { text-align: center; font-size: 13px; color: #4a6a4a; margin-bottom: 6px; }
+.cancel-note { text
