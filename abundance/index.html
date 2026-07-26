@@ -8,7 +8,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #0a0a0f; color: #fff; font-family: 'Helvetica Neue', Arial, sans-serif; direction: rtl; }
 
-/* NAV */
 nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 1px solid #1a1a2a; background: #0a0a0f; }
 .nav-logo { font-size: 18px; font-weight: 700; color: #00e5a0; letter-spacing: 1px; }
 .nav-links { display: flex; gap: 32px; }
@@ -16,7 +15,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .nav-links a:hover { color: #00e5a0; }
 .nav-cta { background: #00e5a0; color: #000; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; }
 
-/* HERO */
 .hero { display: flex; align-items: center; justify-content: space-between; gap: 48px; padding: 80px 48px 60px; min-height: calc(100vh - 65px); max-width: 1280px; margin: 0 auto; }
 .hero-left { flex: 1; max-width: 540px; }
 .hero-badge { display: inline-block; background: rgba(0,229,160,0.1); border: 1px solid #00e5a0; color: #00e5a0; padding: 5px 14px; border-radius: 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
@@ -33,7 +31,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .btn-secondary { background: transparent; border: 1px solid #2a2a3a; color: #aaa; padding: 15px 24px; border-radius: 10px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
 .btn-secondary:hover { border-color: #00e5a0; color: #00e5a0; }
 
-/* CHART PANEL */
 .hero-right { flex: 1; max-width: 620px; position: relative; }
 .chart-panel { background: #0d0d1a; border: 1px solid #1e2a3a; border-radius: 16px; overflow: hidden; box-shadow: 0 0 60px rgba(0,229,160,0.08); }
 .chart-topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1e2a3a; background: #0b0b18; flex-direction: row; direction: ltr; }
@@ -47,11 +44,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .chart-price { font-size: 15px; color: #fff; font-weight: 700; display: block; }
 .chart-change { font-size: 12px; color: #ff4d4d; }
 .chart-body { position: relative; background: #0d0d1a; height: 360px; overflow: hidden; }
-
-/* SVG CHART */
 .chart-svg { width: 100%; height: 100%; }
-
-/* Chart annotations */
 .signal-badge { position: absolute; padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
 .signal-short { background: rgba(255,59,59,0.15); border: 1px solid #ff3b3b; color: #ff6b6b; top: 28px; right: 38%; }
 .signal-long { background: rgba(0,229,160,0.15); border: 1px solid #00e5a0; color: #00e5a0; top: 62%; right: 28%; }
@@ -60,16 +53,13 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .chart-dates { position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px; font-size: 10px; color: #444; direction: ltr; }
 .chart-prices-axis { position: absolute; top: 0; bottom: 30px; left: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 8px; font-size: 10px; color: #444; direction: ltr; }
 
-/* STATS BAR */
 .stats-bar { background: #0b0b18; border-top: 1px solid #1a1a2a; border-bottom: 1px solid #1a1a2a; padding: 22px 48px; display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
 .stat-item { display: flex; align-items: center; gap: 10px; padding: 0 36px; border-left: 1px solid #1a1a2a; flex-direction: row-reverse; }
 .stat-item:last-child { border-left: none; }
-.stat-item:first-child { border-right: none; }
 .stat-icon { font-size: 20px; }
 .stat-text strong { display: block; font-size: 15px; color: #fff; font-weight: 700; text-align: right; }
 .stat-text span { font-size: 11px; color: #445566; text-transform: uppercase; letter-spacing: 1px; display: block; text-align: right; }
 
-/* PRICING SECTION */
 .pricing-section { padding: 80px 48px; display: flex; flex-direction: column; align-items: center; max-width: 1280px; margin: 0 auto; }
 .section-label { font-size: 11px; color: #00e5a0; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; text-align: center; }
 .section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: #fff; text-align: center; margin-bottom: 10px; }
@@ -81,4 +71,5 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .price-amount { font-size: 60px; font-weight: 800; color: #00e5a0; line-height: 1; }
 .price-mo { font-size: 18px; color: #4a5a6a; align-self: flex-end; padding-bottom: 6px; }
 .then-price { font-size: 13px; color: #4a5a6a; margin-bottom: 28px; text-align: right; }
-.pricing-features { list-style:
+.pricing-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+.pricing-features li { display: flex; align-items: center; gap: 10px; font-size: 14px; color:
