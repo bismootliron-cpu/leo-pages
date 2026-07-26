@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abundance for All — TradingView Indicator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  background-color: #0a0a0a;
+}
+
+.hero-badge {
+  display: inline-block;
+  background-color: #1a1a0a;
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 999px;
+  margin-bottom: 32px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900;
+  color: #ffffff;
+  max-width: 800px;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+
+.hero h1 span {
+  color: #d4af37;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #cccccc;
+  max-width: 600px;
+  margin-bottom: 40px;
+}
+
+.btn-primary {
+  display: inline-block;
+  background-color: #d4af37;
+  color: #0a0a0a;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 16px 36px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #e8c94a;
+}
+
+/* FEATURES */
+.features {
+  background-color: #0a0a0a;
+  padding: 80px 24px;
+}
+
+.features h2 {
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 48px;
+}
+
+.features-grid {
+  display: flex;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  flex: 1 1 280px;
+  background-color: #111111;
+  border-top: 3px solid #d4af37;
+  border-radius: 10px;
+  padding: 32px 28px;
+}
+
+.feature-card .icon {
+  font-size: 2rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.feature-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #d4af37;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.feature-card p {
+  font-size: 0.95rem;
+  color: #cccccc;
+}
+
+/* CHART */
+.chart-section {
+  background-color: #0a0a0a;
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-section h2 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.chart-wrapper {
+  width: 100%;
+  max-width: 860px;
+  background-color: #111111;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #222222;
+}
+
+.chart-wrapper svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* STATS */
+.stats-bar {
+  background-color: #0f0f0f;
+  padding: 60px 24px;
+}
+
+.stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.stat-box {
+  flex: 1 1 200px;
+  background-color: #111111;
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.stat-box .stat-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d4af37;
+  margin-bottom: 6px;
+}
+
+.stat-box .stat-label {
+  font-size: 0.85rem;
+  color: #aaaaaa;
+}
+
+/* PRICING */
+.pricing {
+  background-color: #0a0a0a;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pricing h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.pricing-card {
+  background-color: #111111;
+  border: 2px solid #d4af37;
+  border-radius: 14px;
+  padding: 48px 48px;
+  text-align: center;
+  max-width: 440px;
+  width: 100%;
+}
+
+.pricing-price {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #d4af37;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.pricing-period {
+  font-size: 0.95rem;
+  color: #aaaaaa;
+  margin-bottom: 16px;
+}
+
+.pricing-after {
+  font-size: 1rem;
+  color: #cccccc;
+  margin-bottom: 20px;
+}
+
+.pricing-trial {
+  font-size: 0.95rem;
+  color: #d4af37;
+  margin-bottom: 32px;
+}
+
+/* FOOTER */
+footer {
+  background-color: #0a0a0a;
+  padding: 32px 24px;
+  text-align: center;
+  border-top: 1px solid #1a1a1a;
+}
+
+footer p {
+  font-size: 0.85rem;
+  color: #666666;
+}
+
+@media (max-width: 640px) {
+  .features-grid {
+    flex-direction: column;
+  }
+  .stats-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .stat-box {
+    max-width: 100%;
+  }
+  .pricing-card {
+    padding: 36px 28px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">TradingView Indicator</div>
+  <h1>Trade only when it's <span>confirmed.</span></h1>
+  <p>A signal confirmation layer that filters market noise and alerts you only when the odds are in your favor.</p>
+  <a href="https://whop.com" class="btn-primary">Start Free 3-Day Trial</a>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2>Why Abundance for All?</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="icon">🔶</span>
+      <h3>3-Layer Filtering</h3>
+      <p>Trend, momentum and structure must align before any signal is issued. No guesswork — only confluence.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🔔</span>
+      <h3>Real-Time Alerts</h3>
+      <p>Get notified the moment a high-probability setup is ready. Never miss an entry again.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🌐</span>
+      <h3>Any Market, Any Timeframe</h3>
+      <p>Stocks, Forex, Crypto, Futures and more. Works on every chart, every timeframe in TradingView.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INLINE SVG CHART -->
+<section class="chart-section">
+  <h2>Real Results, Real Charts</h2>
+  <div class="chart-wrapper">
+    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="META stock chart showing 268.33% gain">
+
+      <!-- Background -->
+      <rect width="800" height="300" fill="#111111"/>
+
+      <!-- Grid lines horizontal -->
+      <line x1="60" y1="40"  x2="780" y2="40"  stroke="#222222" stroke-width="1"/>
+      <line x1="60" y1="90"  x2="780" y2="90"  stroke="#222222" stroke-width="1"/>
+      <line x1="60" y1="140" x2="780" y2="140" stroke="#222222" stroke-width="1"/>
+      <line x1="60" y1="190" x2="780" y2="190" stroke="#222222" stroke-width="1"/>
+      <line x1="60" y1="240" x2="780" y2="240" stroke="#222222" stroke-width="1"/>
+
+      <!-- Grid lines vertical -->
+      <line x1="160" y1="30" x2="160" y2="260" stroke="#222222" stroke-width="1"/>
+      <line x1="280" y1="30" x2="280" y2="260" stroke="#222222" stroke-width="1"/>
+      <line x1="400" y1="30" x2="400" y2="260" stroke="#222222" stroke-width="1"/>
+      <line x1="520" y1="30" x2="520" y2="260" stroke="#222222" stroke-width="1"/>
+      <line x1="640" y1="30" x2="640" y2="260" stroke="#222222" stroke-width="1"/>
+
+      <!-- Y-axis labels
