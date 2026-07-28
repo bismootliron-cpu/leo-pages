@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Signal Endpoint — Task Brief</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #f78166;
+      color: #0d1117;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #8b949e;
+      margin-bottom: 36px;
+    }
+
+    .warning-box {
+      background: #2d1b00;
+      border: 1.5px solid #e3b341;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .warning-box .icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .warning-box p {
+      font-size: 14px;
+      color: #e3b341;
+      line-height: 1.6;
+    }
+
+    .warning-box strong {
+      color: #ffd166;
+    }
+
+    .section {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: #1c2128;
+      border-bottom: 1px solid #30363d;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-num {
+      background: #238636;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .section-body {
+      padding: 18px 20px;
+    }
+
+    .section-body p {
+      font-size: 14px;
+      color: #c9d1d9;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .section-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-body ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    .section-body li {
+      font-size: 14px;
+      color: #c9d1d9;
+      line-height: 1.8;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      color: #79c0ff;
+      white-space: pre;
+      line-height: 1.6;
+    }
+
+    .code-block pre .kw  { color: #ff7b72; }
+    .code-block pre .str { color: #a5d6ff; }
+    .code-block pre .cm  { color: #8b949e; font-style: italic; }
+    .code-block pre .fn  { color: #d2a8ff; }
+    .code-block pre .num { color: #79c0ff; }
+    .code-block pre .var { color: #ffa657; }
+
+    .acceptance {
+      background: #0d2d0d;
+      border: 1.5px solid #238636;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+
+    .acceptance h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #3fb950;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .check-item:last-child { margin-bottom: 0; }
+
+    .check-num {
+      background: #238636;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .check-item p {
+      font-size: 14px;
+      color: #aff3b3;
+      line-height: 1.6;
+    }
+
+    .check-item strong {
+      color: #3fb950;
+    }
+
+    .not-done-box {
+      background: #1c0d0d;
+      border: 1.5px solid #f85149;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-top: 20px;
+    }
+
+    .not-done-box p {
+      font-size: 14px;
+      color: #ff7b72;
+      line-height: 1.6;
+    }
+
+    .not-done-box strong {
+      color: #ffa198;
+    }
+
+    .target-url {
+      display: inline-block;
+      background: #1c2128;
+      border: 1px solid #388bfd;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: 'Cascadia Code', monospace;
+      font-size: 13px;
+      color: #79c0ff;
+      margin: 8px 0;
+      word-break: break-all;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-right: 6px;
+      font-family: monospace;
+    }
+
+    .tag.green { background: #0d2d0d; border-color: #238636; color: #3fb950; }
+    .tag.red   { background: #1c0d0d; border-color: #f85149; color: #f85149; }
+    .tag.blue  { background: #0d1b2e; border-color: #388bfd; color: #79c0ff; }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #484f58;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="badge">🚨 Agent Task — Hermes Backend</div>
+  <h1>POST /webhook/indicator-signal</h1>
+  <p class="subtitle">Edit <code style="color:#79c0ff;background:#161b22;padding:2px 6px;border-radius:4px;">main.py</code> in <strong style="color:#ffa657;">hermes-orchestrator</strong> — NOT leo-pages</p>
+
+  <div class="warning-box">
+    <div class="icon">⚠️</div>
+    <p>
+      <strong>Critical:</strong> This task targets the <strong>hermes-orchestrator</strong> GitHub repo
+      and Railway project — not leo-pages. All edits go into <strong>main.py</strong> of that repo.
+      Push to <strong>main</strong> branch to trigger auto-deploy on Railway.
+    </p>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Edit main.py — Add Endpoint Inside do_POST</div>
+    </div>
+    <div class="section-body">
+      <p>Inside <code style="color:#79c0ff;">class HermesHandler</code>, in the <code style="color:#79c0ff;">do_POST</code> method, add:</p>
+      <div class="code-block"><pre><span class="kw">if</span> <span class="var">self</span>.path == <span class="str">"/webhook/indicator-signal"</span>:
+    content_len = <span class="fn">int</span>(<span class="var">self</span>.headers.get(<span class="str">'Content-Length'</span>, <span class="num">0</span>))
+    body = <span class="var">self</span>.rfile.<span class="fn">read</span>(content_len)
+    data = json.<span class="fn">loads</span>(body)
+
+    payload = {
+        <span class="str">"instrument"</span>:     data.get(<span class="str">"instrument"</span>),
+        <span class="str">"timeframe"</span>:      data.get(<span class="str">"timeframe"</span>),
+        <span class="str">"signal_type"</span>:    data.get(<span class="str">"signal_type"</span>),
+        <span class="str">"price_at_signal"</span>: data.get(<span class="str">"price_at_signal"</span>),
+    }
+
+    res = supabase.<span class="fn">table</span>(<span class="str">"signal_log"</span>).<span class="fn">insert</span>(payload).<span class="fn">execute</span>()
+    new_id = res.data[<span class="num">0</span>][<span class="str">"id"</span>]
+
+    <span class="var">self</span>.<span class="fn">send_response</span>(<span class="num">200</span>)
+    <span class="var">self
