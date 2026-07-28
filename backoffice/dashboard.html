@@ -624,6 +624,77 @@ body {
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── MOBILE LAYOUT (portrait phones) ── */
+.mobile-toggle {
+  display: none;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 150;
+}
+.drawer-overlay.open { display: block; }
+
+@media (max-width: 860px) {
+  .topbar-center { display: none; }
+  .mobile-toggle { display: flex; }
+
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar, .chat-panel {
+    position: fixed;
+    top: 52px;
+    bottom: 0;
+    width: 82vw;
+    max-width: 320px;
+    z-index: 160;
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .chat-panel {
+    right: 0;
+    transform: translateX(100%);
+  }
+  .chat-panel.open { transform: translateX(0); }
+
+  .center { width: 100%; }
+
+  /* Mobile tab bar replaces the hidden topbar-center nav */
+  .mobile-tabbar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+  .mobile-tabbar .nav-pill {
+    flex-shrink: 0;
+    border-radius: 0;
+    padding: 10px 14px;
+  }
+}
+
+.mobile-tabbar { display: none; }
 </style>
 </head>
 <body>
@@ -652,6 +723,7 @@ body {
 
 <!-- TOPBAR -->
 <div class="topbar">
+  <div class="mobile-toggle" onclick="toggleDrawer('sidebar')">☰</div>
   <div class="brand">HERMES <span>OS</span></div>
   <div class="topbar-center">
     <div class="nav-pill active" onclick="showTab('dashboard', this)">לוח בקרה</div>
@@ -667,8 +739,20 @@ body {
     </div>
     <div class="clock" id="clock"></div>
     <div class="settings-btn" onclick="openSettings()">⚙</div>
+    <div class="mobile-toggle" onclick="toggleDrawer('chat')">💬</div>
   </div>
 </div>
+
+<!-- MOBILE TAB BAR (replaces topbar-center on narrow screens) -->
+<div class="mobile-tabbar" id="mobileTabbar">
+  <div class="nav-pill active" onclick="showTab('dashboard', this, true)">לוח בקרה</div>
+  <div class="nav-pill" onclick="showTab('network', this, true)">רשת סוכנים</div>
+  <div class="nav-pill" onclick="showTab('tasks', this, true)">משימות</div>
+  <div class="nav-pill" onclick="showTab('projects', this, true)">פרויקטים</div>
+  <div class="nav-pill" onclick="showTab('files', this, true)">קבצים</div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawers()"></div>
 
 <!-- MAIN -->
 <div class="main">
@@ -1052,24 +1136,47 @@ checkHealth();
 setInterval(checkHealth, 30000);
 
 // ── TABS ──
-function showTab(name, el) {
+function showTab(name, el, fromMobile) {
   document.querySelectorAll('.tab-view, .network-view').forEach(t => {
     t.classList.remove('visible');
   });
   const tab = document.getElementById('tab-' + name);
   if (tab) tab.classList.add('visible');
 
-  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
-  if (el) el.classList.add('active');
+  // Keep both the desktop topbar and the mobile tab bar in sync
+  document.querySelectorAll('.topbar-center .nav-pill, .mobile-tabbar .nav-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll(`.topbar-center .nav-pill, .mobile-tabbar .nav-pill`).forEach(p => {
+    if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(`'${name}'`)) p.classList.add('active');
+  });
 
   if (name === 'network') drawNetwork();
   if (name === 'files') loadFiles();
+  if (fromMobile) closeDrawers();
+}
+
+// ── MOBILE DRAWERS ──
+function toggleDrawer(which) {
+  const el = document.querySelector(which === 'sidebar' ? '.sidebar' : '.chat-panel');
+  const overlay = document.getElementById('drawerOverlay');
+  const isOpen = el.classList.contains('open');
+  closeDrawers();
+  if (!isOpen) {
+    el.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeDrawers() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.chat-panel').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
 }
 
 // ── CONTEXT ──
 function setContext(name) {
   currentContext = name;
   document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
+  closeDrawers();
 }
 
 function setCtx(el, name) {
