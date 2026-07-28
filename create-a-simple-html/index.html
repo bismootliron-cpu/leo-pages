@@ -4,11 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>test-status-fix</title>
+  <style>
+    body {
+      background-color: #1a1a2e;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #e0e0e0;
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+    p {
+      color: #b0b0c0;
+      font-size: 1.1rem;
+    }
+    .notice {
+      margin-top: 40px;
+      background-color: #2a1a1a;
+      border: 1px solid #c0392b;
+      border-radius: 8px;
+      padding: 20px 28px;
+      max-width: 600px;
+      width: 100%;
+    }
+    .notice h2 {
+      color: #e74c3c;
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+    .notice p {
+      color: #e0c0c0;
+      font-size: 0.97rem;
+      margin: 6px 0;
+    }
+    .notice ul {
+      color: #e0c0c0;
+      font-size: 0.97rem;
+      padding-left: 20px;
+    }
+    .notice li {
+      margin-bottom: 6px;
+    }
+  </style>
 </head>
-<body style="background-color: #1a1a2e; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
-  <div style="text-align: center; padding: 40px;">
-    <h1 style="color: #00ff88; font-size: 2.5rem; margin-bottom: 20px;">test-status-fix</h1>
-    <p style="color: #e0e0e0; font-size: 1.2rem;">System check — deployment pipeline working correctly.</p>
+<body>
+  <h1>test-status-fix</h1>
+  <p>System check — deployment pipeline working correctly. Run #2.</p>
+
+  <div class="notice">
+    <h2>⚠️ Important Transparency Notice</h2>
+    <p>This HTML file was <strong style="color:#e74c3c;">returned as output only</strong> — it was <strong style="color:#e74c3c;">NOT pushed</strong> to any GitHub repository.</p>
+    <p>I (this AI) cannot:</p>
+    <ul>
+      <li>Access GitHub or any external API</li>
+      <li>Push files to repositories</li>
+      <li>Deploy to Cloudflare Pages</li>
+      <li>Execute any code or terminal commands</li>
+    </ul>
+    <p>To push this file, you must manually copy it and run:</p>
+    <p style="color:#f39c12; font-family: monospace; background:#111; padding:8px; border-radius:4px;">
+      git add test-status-fix-2.html<br>
+      git commit -m "test: status fix verification page run 2"<br>
+      git push
+    </p>
   </div>
 </body>
 </html>
