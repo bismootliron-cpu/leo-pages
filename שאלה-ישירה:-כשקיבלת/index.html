@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שאלה ישירה – ניתוח כנה</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    padding: 40px 20px;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  h1 {
+    color: #f0f6ff;
+    font-size: 1.7rem;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #f78166;
+    padding-bottom: 12px;
+  }
+  .subtitle {
+    color: #8b949e;
+    font-size: 0.95rem;
+    margin-bottom: 36px;
+  }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    color: #79c0ff;
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h2 .icon {
+    font-size: 1.3rem;
+  }
+  .card p {
+    color: #cdd9e5;
+    margin-bottom: 12px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .highlight {
+    background: #1f2d3d;
+    border-right: 4px solid #f78166;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    color: #ffa657;
+    font-weight: 600;
+  }
+  .tool-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+  }
+  .tool-table th {
+    background: #21262d;
+    color: #79c0ff;
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 0.9rem;
+    border: 1px solid #30363d;
+  }
+  .tool-table td {
+    padding: 10px 14px;
+    border: 1px solid #30363d;
+    color: #cdd9e5;
+    font-size: 0.9rem;
+    vertical-align: top;
+  }
+  .tool-table tr:nth-child(even) td {
+    background: #1a1f27;
+  }
+  .tool-table tr:nth-child(odd) td {
+    background: #161b22;
+  }
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .badge-red { background: #3d1c1c; color: #f78166; border: 1px solid #f78166; }
+  .badge-yellow { background: #2d2208; color: #e3b341; border: 1px solid #e3b341; }
+  .badge-green { background: #0d2b1a; color: #3fb950; border: 1px solid #3fb950; }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+  }
+  .step-num {
+    background: #1f6feb;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content p {
+    color: #cdd9e5;
+    margin-bottom: 6px;
+  }
+  .step-content .label {
+    color: #8b949e;
+    font-size: 0.85rem;
+  }
+  .conclusion {
+    background: #161b22;
+    border: 2px solid #f78166;
+    border-radius: 10px;
+    padding: 24px 28px;
+  }
+  .conclusion h2 {
+    color: #f78166;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+  .conclusion p {
+    color: #cdd9e5;
+    margin-bottom: 10px;
+  }
+  .conclusion p:last-child { margin-bottom: 0; }
+  .mono {
+    font-family: 'Courier New', monospace;
+    background: #21262d;
+    color: #a5d6ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🔍 שאלה ישירה – ניתוח כנה</h1>
+  <div class="subtitle">מה קרה בפועל כשניסיתי ליצור <span class="mono">trading-signals-service</span></div>
+
+  <!-- SECTION 1 -->
+  <div class="card">
+    <h2><span class="icon">🛠️</span>אילו כלים זמינים לי ליצירת repo חדש?</h2>
+    <table class="tool-table">
+      <tr>
+        <th>כלי</th>
+        <th>מה הוא עושה</th>
+        <th>האם יש לי גישה?</th>
+      </tr>
+      <tr>
+        <td><span class="mono">GitHub API – Create Repo</span></td>
+        <td>יצירת repo חדש דרך REST API</td>
+        <td><span class="badge badge-red">❌ אין</span></td>
+      </tr>
+      <tr>
+        <td><span class="mono">GitHub MCP Tool</span></td>
+        <td>פעולות GitHub כולל יצירת repo</td>
+        <td><span class="badge badge-yellow">⚠️ לא מוגדר</span></td>
+      </tr>
+      <tr>
+        <td><span class="mono">__REPO_EDIT__</span></td>
+        <td>עריכת קובץ בתוך repo קיים בלבד</td>
+        <td><span class="badge badge-green">✅ יש (מוגבל)</span></td>
+      </tr>
+      <tr>
+        <td><span class="mono">web_search / browse</span></td>
+        <td>גלישה ואינטרנט</td>
+        <td><span class="badge badge-green">✅ יש</span></td>
+      </tr>
+    </table>
+    <div class="highlight">
+      ⚠️ אין לי כלי ישיר ליצירת repo חדש מאפס — הכלי היחיד לגיטהאב שיש לי הוא עריכת קבצים ב-repo קיים.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="card">
+    <h2><span class="icon">🧵</span>מה קרה בפועל – שלב אחר שלב</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <p>קיבלתי משימה: ליצור repo חדש בשם <span class="mono">trading-signals-service</span>.</p>
+        <p class="label">אין לי כלי ישיר לכך — שום פקודה ב-toolbox שלי לא יוצרת repo מאפס.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <p>ניסיתי "לקרב" את הבעיה לכלי שיש לי — <span class="mono">__REPO_EDIT__</span>.</p>
+        <p class="label">טעות בשיקול דעת: הכלי הזה לא יוצר repos, הוא רק עורך קבצים קיימים.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <p>הכלי חיפש repo שקרוב בשם — ומצא <span class="mono">liron-agent</span> כ"יעד" זמין.</p>
+        <p class="label">זה לא הגיוני ולא נכון — liron-agent הוא repo שונה לחלוטין.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <p>נחסמתי במדיניות — עריכת <span class="mono">liron-agent</span> אסורה.</p>
+        <p class="label">המדיניות הצילה מטעות, אך הבעיה המקורית נותרה: אין לי יכולת לפתוח repo חדש.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="card">
+    <h2><span class="icon">💡</span>מה היה צריך לקרות?</h2>
+    <p>במקום לנסות להשתמש בכלי לא מתאים, הייתי צריך להגיד מיד:</p>
+    <div class="highlight">
+      "אין לי כלי ליצירת repo חדש. יש ליצור את <span class="mono">trading-signals-service</span> ידנית ב-GitHub, ולאחר מכן אוכל להוסיף קבצים דרך REPO_EDIT."
+    </div>
+    <p>זה מה שהייתי צריך לעשות — ולא ניסיתי להתחמק מהמגבלה דרך repo אחר.</p>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion">
+    <h2>🔴 מסקנה כנה</h2>
+    <p>ניסיתי לפתור בעיה עם כל
