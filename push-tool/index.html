@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כלי Push ישיר - עוקף טלגרם ו-Claude</title>
+<style>
+body { font-family: sans-serif; background: #0a0a0a; color: #eee; padding: 20px; max-width: 700px; margin: 0 auto; }
+label { display: block; margin-top: 16px; margin-bottom: 6px; font-size: 13px; color: #aaa; }
+input, textarea { width: 100%; background: #111; border: 1px solid #333; border-radius: 8px; padding: 10px; color: #fff; font-family: monospace; font-size: 13px; box-sizing: border-box; }
+textarea { height: 300px; resize: vertical; }
+button { margin-top: 16px; padding: 12px 24px; background: #6c63ff; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer; }
+button:disabled { opacity: 0.5; }
+#status { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; white-space: pre-wrap; }
+.ok { background: rgba(0,229,204,0.1); border: 1px solid #00e5cc; }
+.err { background: rgba(255,77,109,0.1); border: 1px solid #ff4d6d; }
+</style>
+</head>
+<body>
+<h2>🚀 Push ישיר ל-Leo</h2>
+<p style="color:#888;font-size:13px">שולח קובץ ישירות ל-Hermes דרך HTTP — בלי טלגרם (מוגבל ל-4096 תווים), בלי Claude (עלול לשנות תוכן). מתאים בדיוק לקבצים גדולים כמו dashboard.html.</p>
+
+<label>Hermes URL</label>
+<input id="hermesUrl" placeholder="https://hermes-xxx.up.railway.app">
+
+<label>Backoffice Token</label>
+<input id="token" type="password" placeholder="hermes-backoffice-2026">
+
+<label>נתיב בריפו (path)</label>
+<input id="path" placeholder="backoffice/dashboard.html">
+
+<label>תוכן הקובץ המלא</label>
+<textarea id="content" placeholder="הדבק כאן את כל תוכן הקובץ..."></textarea>
+
+<button id="btn" onclick="pushFile()">דחוף עכשיו</button>
+<div id="status" style="display:none"></div>
+
+<script>
+window.onload = () => {
+  document.getElementById('hermesUrl').value = localStorage.getItem('hermes_url') || '';
+  document.getElementById('token').value = localStorage.getItem('hermes_token') || 'hermes-backoffice-2026';
+};
+
+async function pushFile() {
+  const hermesUrl = document.getElementById('hermesUrl').value.trim();
+  const token = document.getElementById('token').value.trim();
+  const path = document.getElementById('path').value.trim();
+  const content = document.getElementById('content').value;
+  const status = document.getElementById('status');
+  const btn = document.getElementById('btn');
+
+  if (!hermesUrl || !path || !content) {
+    status.className = 'err';
+    status.style.display = 'block';
+    status.textContent = 'חסר: URL של Hermes, נתיב, או תוכן.';
+    return;
+  }
+
+  localStorage.setItem('hermes_url', hermesUrl);
+  localStorage.setItem('hermes_token', token);
+
+  btn.disabled = true;
+  status.className = '';
+  status.style.display = 'block';
+  status.textContent = `שולח ${content.length} תווים ל-${path}...`;
+
+  try {
+    const res = await fetch(hermesUrl + '/push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ path, content })
+    });
+    const data = await res.json();
+    if (data.task_id) {
+      status.className = 'ok';
+      status.textContent = `✅ נשלח בהצלחה. task_id: ${data.task_id}\nLeo עובד על זה ברקע — בדוק את הדף בעוד דקה.`;
+    } else {
+      status.className = 'err';
+      status.textContent = `⚠️ שגיאה: ${JSON.stringify(data)}`;
+    }
+  } catch (e) {
+    status.className = 'err';
+    status.textContent = `⚠️ שגיאת חיבור: ${e}`;
+  }
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
