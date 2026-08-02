@@ -3,72 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy — Singularity Indicator</title>
+<title>Register — Singularity Indicator</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0a0a0a; color: #ccc; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.7; }
-.wrap { max-width: 680px; margin: 0 auto; padding: 48px 20px 60px; }
-h1 { color: #d4af37; font-size: 26px; margin-bottom: 8px; }
-.updated { color: #666; font-size: 12px; margin-bottom: 32px; }
-h2 { color: #fff; font-size: 16px; margin: 28px 0 10px; }
-p, li { color: #999; font-size: 14px; margin-bottom: 10px; }
-ul { margin-left: 20px; margin-bottom: 10px; }
-a { color: #d4af37; }
-.note { background: #14140a; border: 1px solid #3a3a1a; border-radius: 8px; padding: 14px 16px; margin-bottom: 28px; font-size: 12px; color: #d4af37; }
-.back { display: inline-block; margin-top: 30px; color: #d4af37; text-decoration: none; font-size: 13px; }
+body { background: #0a0a0a; color: #fff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+.wrap { max-width: 480px; margin: 0 auto; padding: 48px 20px 60px; }
+.badge { display: inline-block; background: rgba(212,175,55,0.15); border: 1px solid #d4af37; color: #d4af37; padding: 6px 16px; border-radius: 20px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
+h1 { font-size: 30px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+.subtitle { font-size: 15px; color: #999; line-height: 1.6; margin-bottom: 32px; }
+.summary-box { background: #111; border: 1px solid #222; border-radius: 14px; padding: 22px; margin-bottom: 28px; }
+.summary-box .plan-name { font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.summary-box .plan-price { font-size: 28px; font-weight: 700; color: #d4af37; }
+.summary-box .plan-price span { font-size: 13px; color: #999; font-weight: 400; }
+.summary-box .plan-note { font-size: 12px; color: #999; margin-top: 4px; }
+.disclaimer-box { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 18px 20px; margin-bottom: 22px; max-height: 260px; overflow-y: auto; }
+.disclaimer-box h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #d4af37; margin-bottom: 10px; }
+.disclaimer-box p { font-size: 12.5px; color: #999; line-height: 1.7; }
+.check-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 28px; }
+.check-row input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; accent-color: #d4af37; }
+.check-row label { font-size: 13px; color: #ccc; line-height: 1.6; cursor: pointer; }
+.btn { display: block; width: 100%; padding: 16px; background: #d4af37; color: #000; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; text-align: center; text-decoration: none; cursor: pointer; transition: opacity 0.15s; }
+.btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+.footer-note { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
+.footer-note a { color: #777; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="note">
-    ⚠️ Draft — this is a generic starting template, not reviewed by a lawyer.
-    Placeholders like [Company Name] / [Contact Email] / [Jurisdiction] must
-    be filled in and the whole document reviewed before relying on it,
-    especially given an international customer base.
+  <div class="badge">TRADINGVIEW INDICATOR</div>
+  <h1>You're one step away.</h1>
+  <p class="subtitle">Confirm you understand how this works, then continue to secure checkout.</p>
+
+  <div class="summary-box">
+    <div class="plan-name">Singularity Indicator — Monthly</div>
+    <div class="plan-price">$15<span>/mo</span></div>
+    <div class="plan-note">First 3 months, then $49/mo. 3-day free trial.</div>
   </div>
 
-  <h1>Privacy Policy</h1>
-  <div class="updated">Last updated: [DATE]</div>
+  <div class="disclaimer-box">
+    <h3>Disclaimer</h3>
+    <p>
+      This service provides technical trading signals and information only.
+      It does not constitute investment advice, a recommendation to act, or
+      any guarantee of results. Trading in financial markets (forex,
+      crypto, equities, or any other instrument) carries a risk of capital
+      loss. The decision to use this information, and any outcome
+      resulting from it, is the sole responsibility of the user.
+      Singularity Indicator bears no liability for any direct or indirect
+      damage. Past performance shown in any example or marketing material
+      is not indicative of future results.
+    </p>
+  </div>
 
-  <h2>1. Who We Are</h2>
-  <p>Singularity Indicator ("we", "us", "our") provides a TradingView-based signal confirmation indicator and related services. This policy explains what information we collect, why, and how it's handled. Operated by [Company Name], [Jurisdiction].</p>
+  <div class="check-row">
+    <input type="checkbox" id="disclaimerCheck">
+    <label for="disclaimerCheck">I have read and understood this disclaimer, and I confirm that responsibility for my trading decisions is mine alone.</label>
+  </div>
 
-  <h2>2. Information We Collect</h2>
-  <ul>
-    <li>Email address and payment details — collected by our payment processor (Whop) at checkout; we do not directly store full card details.</li>
-    <li>TradingView username — needed to grant you access to the indicator.</li>
-    <li>Telegram user ID — needed to invite you to the private signals channel.</li>
-    <li>Onboarding questionnaire responses (trading experience, instruments, goals) — used to understand our customer base and improve the service.</li>
-    <li>Basic usage/analytics data (e.g. which page/link you arrived from) — used to understand which marketing channels are effective.</li>
-  </ul>
+  <a href="https://whop.com/singularity-indicator/" class="btn" id="continueBtn" style="pointer-events:none;opacity:0.5;">Continue to Checkout</a>
 
-  <h2>3. How We Use Your Information</h2>
-  <ul>
-    <li>To provide access to the indicator and the private Telegram channel.</li>
-    <li>To communicate with you about your subscription (confirmations, access, support).</li>
-    <li>To improve our product based on aggregate (not individually identifying) trends in questionnaire data.</li>
-    <li>To measure which marketing channels bring us customers, so we can focus our efforts.</li>
-  </ul>
-
-  <h2>4. Third Parties We Share Data With</h2>
-  <p>We use the following third-party services to operate: <strong>Whop</strong> (payments and subscription management), <strong>Telegram</strong> (community access), <strong>TradingView</strong> (indicator access), and standard web analytics/advertising tools (e.g. Meta and TikTok pixels) that may collect data about how you interact with our site for marketing measurement purposes. We do not sell your personal data.</p>
-
-  <h2>5. Data Retention</h2>
-  <p>We retain your information for as long as your subscription is active, and for a reasonable period afterward for record-keeping and legal purposes, after which it is deleted or anonymized.</p>
-
-  <h2>6. Your Rights</h2>
-  <p>Depending on where you live, you may have rights to access, correct, or delete your personal data, or object to certain processing. To exercise these rights, contact us at [Contact Email].</p>
-
-  <h2>7. Cookies & Tracking</h2>
-  <p>We use cookies/similar technologies and URL parameters (UTM tags) to understand where visitors come from, and may use advertising pixels (e.g. Meta, TikTok) once configured, to measure the effectiveness of our marketing.</p>
-
-  <h2>8. Risk & Liability Notice</h2>
-  <p>This service provides technical trading signals and information only. It does not constitute investment advice or a guarantee of results. See the disclaimer on our main site for full details.</p>
-
-  <h2>9. Contact</h2>
-  <p>Questions about this policy: [Contact Email]</p>
-
-  <a href="/singularity-indicator/" class="back">← Back to Singularity Indicator</a>
+  <div class="footer-note">
+    By continuing you'll complete checkout securely via Whop. <a href="/privacy-policy/">Privacy Policy</a>
+  </div>
 </div>
+
+<script>
+const checkbox = document.getElementById('disclaimerCheck');
+const btn = document.getElementById('continueBtn');
+checkbox.addEventListener('change', () => {
+  if (checkbox.checked) {
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+  } else {
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.5';
+  }
+});
+
+// Carry UTM params through to the Whop checkout link, same as the main
+// landing page, so channel attribution isn't lost at this step.
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  const utmPairs = utmKeys.filter(k => params.has(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
+  if (utmPairs.length === 0) return;
+  const url = new URL(btn.href);
+  utmPairs.forEach(pair => {
+    const [k, v] = pair.split('=');
+    url.searchParams.set(k, v);
+  });
+  btn.href = url.toString();
+})();
+</script>
 </body>
 </html>
