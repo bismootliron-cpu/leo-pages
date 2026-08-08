@@ -2,10 +2,1779 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=dashboard.html">
-<title>Hermes OS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes OS — לוח בקרה</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080f;
+  --surface: #0e0e1a;
+  --surface2: #12121f;
+  --border: #1a1a2e;
+  --accent: #6c63ff;
+  --cyan: #00e5cc;
+  --amber: #ffb020;
+  --danger: #ff4d6d;
+  --text: #e8e8f5;
+  --muted: #5a5a7a;
+  --card: #111120;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.brand span { color: var(--muted); font-weight: 300; }
+
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-pill {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  color: var(--muted);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.nav-pill:hover { color: var(--text); border-color: var(--border); }
+.nav-pill.active { background: rgba(108,99,255,0.15); border-color: var(--accent); color: var(--accent); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+
+.dot.online { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); animation: pulse 2s infinite; }
+.dot.offline { background: var(--danger); }
+.dot.amber { background: var(--amber); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.clock {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.settings-btn {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  display: grid;
+  grid-template-columns: 240px 1fr 340px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar {
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0 4px;
+  margin-bottom: 10px;
+}
+
+.project-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+
+.project-card:hover { background: rgba(108,99,255,0.06); border-color: var(--border); }
+.project-card.active { background: rgba(108,99,255,0.1); border-color: var(--accent); }
+
+.pc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.pc-name { font-size: 13px; font-weight: 500; }
+
+.status-badge {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active { background: rgba(0,229,204,0.12); color: var(--cyan); }
+.status-badge.dev { background: rgba(255,176,32,0.12); color: var(--amber); }
+.status-badge.paused { background: rgba(90,90,122,0.2); color: var(--muted); }
+
+.pc-meta { font-size: 10px; color: var(--muted); margin-bottom: 7px; font-family: 'JetBrains Mono', monospace; }
+
+.progress-bar {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+}
+
+/* Agent items */
+.agent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+
+.agent-item:hover { background: rgba(108,99,255,0.06); border-color: var(--border); }
+
+.agent-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.agent-icon.brain { background: rgba(108,99,255,0.2); }
+.agent-icon.ops { background: rgba(0,229,204,0.15); }
+.agent-icon.add { background: rgba(90,90,122,0.15); border: 1px dashed var(--border); color: var(--muted); }
+
+.agent-info { flex: 1; min-width: 0; }
+.agent-name { font-size: 12px; font-weight: 500; }
+.agent-role { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* ── CENTER ── */
+.center {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tab views */
+.tab-view { display: none; padding: 20px; flex-direction: column; gap: 16px; }
+.tab-view.visible { display: flex; }
+
+/* Network view */
+.network-view { display: none; flex: 1; position: relative; }
+.network-view.visible { display: flex; }
+
+/* Metrics row */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.metric-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.15s;
+}
+
+.metric-card:hover { border-color: var(--accent); }
+
+.mc-label {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.mc-value {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.mc-value.accent { color: var(--accent); }
+.mc-value.cyan { color: var(--cyan); }
+.mc-value.amber { color: var(--amber); }
+
+/* Projects grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.project-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.project-tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.project-tile.add-new {
+  border-style: dashed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.pt-title { font-size: 15px; font-weight: 600; }
+.pt-desc { font-size: 11px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; font-family: 'JetBrains Mono', monospace; }
+
+.pt-metrics { display: flex; gap: 16px; margin-bottom: 14px; }
+.pt-metric { text-align: center; }
+.pt-metric-val { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
+.pt-metric-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+.pt-progress { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.pt-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--cyan)); }
+
+/* Tasks */
+.tasks-list { display: flex; flex-direction: column; gap: 6px; }
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.task-row:hover { border-color: var(--accent); }
+
+.task-check {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  transition: all 0.15s;
+}
+
+.task-check.done { background: var(--cyan); border-color: var(--cyan); color: var(--bg); }
+.task-body { flex: 1; }
+.task-title { font-size: 12px; font-weight: 500; }
+.task-project { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.task-agent { font-size: 10px; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-action {
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Network canvas */
+#networkCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── CHAT PANEL ── */
+.chat-panel {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-agent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-agent-icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: rgba(108,99,255,0.2);
+  border: 1px solid rgba(108,99,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.chat-agent-name { font-size: 14px; font-weight: 600; }
+.chat-agent-status { font-size: 10px; color: var(--cyan); font-family: 'JetBrains Mono', monospace; }
+
+.agent-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.agent-chip {
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+}
+
+.agent-chip:hover { border-color: var(--accent); color: var(--accent); }
+.agent-chip.active { background: rgba(108,99,255,0.15); border-color: var(--accent); color: var(--accent); }
+
+.context-bar {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.ctx-chip {
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+}
+
+.ctx-chip.active { background: rgba(0,229,204,0.1); border-color: var(--cyan); color: var(--cyan); }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  max-width: 90%;
+  padding: 10px 13px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.msg.agent {
+  background: var(--card);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-radius: 4px 12px 12px 12px;
+}
+
+.msg.user {
+  background: rgba(108,99,255,0.18);
+  border: 1px solid rgba(108,99,255,0.25);
+  align-self: flex-end;
+  border-radius: 12px 4px 12px 12px;
+  text-align: right;
+}
+
+.msg.leo {
+  background: rgba(0,229,204,0.08);
+  border: 1px solid rgba(0,229,204,0.2);
+  align-self: flex-start;
+  border-radius: 4px 12px 12px 12px;
+}
+
+.msg-header {
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msg-header .agent-tag { color: var(--accent); }
+.msg-header .leo-tag { color: var(--cyan); }
+
+.msg-time { font-size: 9px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+.typing-dots { display: flex; gap: 3px; align-items: center; height: 18px; padding: 0 2px; }
+.typing-dots span { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+.chat-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  max-height: 80px;
+}
+
+.chat-input:focus { border-color: var(--accent); }
+
+.send-btn {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border: none;
+  border-radius: 9px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.send-btn:hover { opacity: 0.85; }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.input-hint {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 5px;
+  text-align: center;
+}
+
+/* Settings modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+.modal-field label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+.modal-field input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: 'JetBrains Mono', monospace; outline: none; }
+.modal-field input:focus { border-color: var(--accent); }
+
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.modal-btn { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-family: 'Space Grotesk', sans-serif; transition: all 0.15s; }
+.modal-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.modal-btn:hover { opacity: 0.85; }
+
+.modal-error { font-size: 11px; color: var(--danger); font-family: 'JetBrains Mono', monospace; display: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── MOBILE LAYOUT (portrait phones) ── */
+.mobile-toggle {
+  display: none;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 150;
+}
+.drawer-overlay.open { display: block; }
+
+@media (max-width: 860px) {
+  .topbar-center { display: none; }
+  .mobile-toggle { display: flex; }
+
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar, .chat-panel {
+    position: fixed;
+    top: 52px;
+    bottom: 0;
+    width: 82vw;
+    max-width: 320px;
+    z-index: 160;
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .chat-panel {
+    right: 0;
+    transform: translateX(100%);
+  }
+  .chat-panel.open { transform: translateX(0); }
+
+  .center { width: 100%; }
+
+  /* Mobile tab bar replaces the hidden topbar-center nav */
+  .mobile-tabbar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+  .mobile-tabbar .nav-pill {
+    flex-shrink: 0;
+    border-radius: 0;
+    padding: 10px 14px;
+  }
+}
+
+.mobile-tabbar { display: none; }
+</style>
 </head>
 <body>
-<p>מעביר ללוח הבקרה... אם זה לא קורה אוטומטית, <a href="dashboard.html">לחץ כאן</a>.</p>
+
+<!-- LOGIN OVERLAY (blocks everything until a valid session exists) -->
+<div class="modal-overlay" id="loginOverlay">
+  <div class="modal">
+    <div>
+      <div class="modal-title">🔐 כניסה לבקאופיס</div>
+      <div class="modal-sub" id="loginSub">שלב 1: פרטי חיבור</div>
+    </div>
+
+    <!-- STEP 1: Hermes URL + token -->
+    <div id="loginStep1">
+      <div class="modal-field" style="margin-bottom:14px">
+        <label>Hermes URL (Railway)</label>
+        <input id="loginHermesUrl" placeholder="https://hermes-xxx.up.railway.app">
+      </div>
+      <div class="modal-field">
+        <label>Backoffice Token</label>
+        <input id="loginToken" type="password" placeholder="הטוקן שלך">
+      </div>
+      <div class="modal-error" id="loginStep1Error"></div>
+      <div class="modal-btns">
+        <button class="modal-btn primary" onclick="requestOtp()">שלח קוד לטלגרם</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: OTP code (hidden until step 1 succeeds) -->
+    <div id="loginStep2" style="display:none">
+      <div class="modal-field">
+        <label>קוד מהטלגרם (6 ספרות)</label>
+        <input id="loginOtpCode" inputmode="numeric" maxlength="6" placeholder="000000" onkeydown="if(event.key==='Enter')verifyOtp()">
+      </div>
+      <div class="modal-error" id="loginStep2Error"></div>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="backToStep1()">חזור</button>
+        <button class="modal-btn primary" onclick="verifyOtp()">אמת והתחבר</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL (view/reset connection — full re-login, not a silent token edit) -->
+<div class="modal-overlay" id="settingsModal" style="display:none">
+  <div class="modal">
+    <div>
+      <div class="modal-title">⚙️ הגדרות מערכת</div>
+      <div class="modal-sub">חיבור ל-Hermes</div>
+    </div>
+    <div class="modal-sub" style="line-height:1.6">
+      מחובר כרגע ל: <span id="settingsCurrentUrl" style="color:var(--text)"></span><br>
+      Session בתוקף עד: <span id="settingsSessionExpiry" style="color:var(--text)"></span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeSettings()">סגור</button>
+      <button class="modal-btn primary" onclick="logout()">התנתק (התחבר מחדש)</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="mobile-toggle" onclick="toggleDrawer('sidebar')">☰</div>
+  <div class="brand">HERMES <span>OS</span></div>
+  <div class="topbar-center">
+    <div class="nav-pill active" onclick="showTab('dashboard', this)">לוח בקרה</div>
+    <div class="nav-pill" onclick="showTab('network', this)">רשת סוכנים</div>
+    <div class="nav-pill" onclick="showTab('tasks', this)">משימות</div>
+    <div class="nav-pill" onclick="showTab('projects', this)">פרויקטים</div>
+    <div class="nav-pill" onclick="showTab('files', this)">קבצים</div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-group">
+      <div class="dot online" id="hermesStatusDot"></div>
+      <span style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace" id="hermesStatusLabel">Hermes</span>
+    </div>
+    <div class="clock" id="clock"></div>
+    <div class="settings-btn" onclick="openSettings()">⚙</div>
+    <div class="mobile-toggle" onclick="toggleDrawer('chat')">💬</div>
+  </div>
+</div>
+
+<!-- MOBILE TAB BAR (replaces topbar-center on narrow screens) -->
+<div class="mobile-tabbar" id="mobileTabbar">
+  <div class="nav-pill active" onclick="showTab('dashboard', this, true)">לוח בקרה</div>
+  <div class="nav-pill" onclick="showTab('network', this, true)">רשת סוכנים</div>
+  <div class="nav-pill" onclick="showTab('tasks', this, true)">משימות</div>
+  <div class="nav-pill" onclick="showTab('projects', this, true)">פרויקטים</div>
+  <div class="nav-pill" onclick="showTab('files', this, true)">קבצים</div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawers()"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="section-label">פרויקטים</div>
+
+      <div class="project-card active" onclick="setContext('כל הפרויקטים')">
+        <div class="pc-top">
+          <div class="pc-name">📊 כל הפרויקטים</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+      </div>
+
+      <div id="sidebarProjectsList"></div>
+
+      <div class="project-card" style="border-style:dashed;opacity:0.5;cursor:pointer" onclick="addProject()">
+        <div style="text-align:center;color:var(--muted);font-size:12px;padding:4px">+ פרויקט חדש</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">סוכנים</div>
+
+      <div class="agent-item" onclick="switchAgent('hermes')">
+        <div class="agent-icon brain">🧠</div>
+        <div class="agent-info">
+          <div class="agent-name">Hermes</div>
+          <div class="agent-role">מוח ראשי — Railway</div>
+        </div>
+        <div class="dot online"></div>
+      </div>
+
+      <div class="agent-item" onclick="switchAgent('leo')">
+        <div class="agent-icon ops">⚙️</div>
+        <div class="agent-info">
+          <div class="agent-name">Leo</div>
+          <div class="agent-role">תפעול — Railway</div>
+        </div>
+        <div class="dot online" id="leoDot"></div>
+      </div>
+
+      <div class="agent-item" style="opacity:0.4;cursor:pointer" onclick="addAgent()">
+        <div class="agent-icon add">+</div>
+        <div class="agent-info">
+          <div class="agent-name" style="color:var(--muted)">הוסף סוכן</div>
+          <div class="agent-role">חבר סוכן חדש</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-view visible" id="tab-dashboard">
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="mc-label">פרויקטים</div>
+          <div class="mc-value accent">4</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-label">סוכנים פעילים</div>
+          <div class="mc-value cyan">2</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-label">משימות פתוחות</div>
+          <div class="mc-value amber" id="openTasks">6</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-label">זמן פעילות</div>
+          <div class="mc-value" style="font-size:18px" id="uptime">00:00:00</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <div class="section-title">פרויקטים פעילים</div>
+          <div class="section-action" onclick="showTab('projects')">הכל ←</div>
+        </div>
+        <div class="projects-grid" id="dashProjectsGrid"></div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <div class="section-title">משימות פעילות</div>
+          <div class="section-action" onclick="showTab('tasks')">הכל ←</div>
+        </div>
+        <div class="tasks-list" id="dashTasksList"></div>
+      </div>
+    </div>
+
+    <!-- NETWORK TAB -->
+    <div class="network-view" id="tab-network">
+      <canvas id="networkCanvas"></canvas>
+    </div>
+
+    <!-- TASKS TAB -->
+    <div class="tab-view" id="tab-tasks">
+      <div class="section-header">
+        <div class="section-title">כל המשימות</div>
+        <button onclick="addTask()" style="padding:6px 14px;background:var(--accent);border:none;border-radius:7px;color:white;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif">+ משימה</button>
+      </div>
+      <div class="tasks-list" id="allTasksList">
+        <!-- Tasks populated dynamically -->
+      </div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div class="tab-view" id="tab-projects">
+      <div class="section-header">
+        <div class="section-title">כל הפרויקטים</div>
+        <button onclick="addProject()" style="padding:6px 14px;background:var(--accent);border:none;border-radius:7px;color:white;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif">+ פרויקט</button>
+      </div>
+      <div class="projects-grid" id="allProjectsGrid">
+        <!-- Projects populated dynamically -->
+      </div>
+    </div>
+
+    <!-- FILES TAB -->
+    <div class="tab-view" id="tab-files">
+      <div class="section-header">
+        <div class="section-title">קבצים משותפים</div>
+        <button onclick="document.getElementById('fileInput').click()" style="padding:6px 14px;background:var(--accent);border:none;border-radius:7px;color:white;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif">+ העלה קובץ</button>
+      </div>
+      <div class="tasks-list" id="filesList">
+        <div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">טוען...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-agent">
+        <div class="chat-agent-icon" id="chatAgentIcon">🧠</div>
+        <div>
+          <div class="chat-agent-name" id="chatAgentName">Hermes</div>
+          <div class="chat-agent-status" id="chatAgentStatus">● מוח ראשי</div>
+        </div>
+      </div>
+      <div class="agent-selector">
+        <div class="agent-chip active" onclick="switchAgent('hermes', this)">Hermes</div>
+        <div class="agent-chip" onclick="switchAgent('leo', this)">Leo (תצוגה בלבד)</div>
+      </div>
+    </div>
+
+    <div class="context-bar" id="contextBar">
+      <div class="ctx-chip active" onclick="setCtx(this,'כל הפרויקטים')">הכל</div>
+      <div class="ctx-chip" onclick="setCtx(this,'Abundance for All')">Abundance</div>
+      <div class="ctx-chip" onclick="setCtx(this,'Jon Jon')">Jon Jon</div>
+      <div class="ctx-chip" onclick="setCtx(this,'Seranova')">Seranova</div>
+      <div class="ctx-chip" onclick="setCtx(this,'Trading Bot')">Trading</div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg agent">
+        <div class="msg-header"><span class="agent-tag">Hermes</span></div>
+        שלום לירון ✋<br>אני כאן לנהל את כל הפרויקטים.<br>על מה עובדים היום?
+        <div class="msg-time" id="initTime"></div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="input-row">
+        <input type="file" id="fileInput" style="display:none" onchange="handleFileSelected(event)">
+        <button class="send-btn" id="attachBtn" onclick="document.getElementById('fileInput').click()" title="צרף קובץ" style="background:var(--card);border:1px solid var(--border)">📎</button>
+        <textarea class="chat-input" id="chatInput" rows="2" placeholder="כתוב הוראה..." onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="input-hint" id="inputHint">Enter לשליחה · Shift+Enter לשורה חדשה · 📎 לצירוף קובץ</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──
+let currentAgent = 'hermes';
+let currentContext = 'כל הפרויקטים';
+let chatHistory = [];
+let startTime = Date.now();
+let sessionExpiresAt = null; // ms epoch, set after a successful OTP verify
+
+// ── CONFIG ──
+// NOTE: hermes_url is the only thing configured up front now. The raw
+// BACKOFFICE_TOKEN is used ONCE, during login (/auth/request-otp), and is
+// never stored or reused after that — every subsequent request uses the
+// short-lived session_token issued by /auth/verify-otp instead. This is
+// the whole point of the OTP flow: even if the raw token leaks, it isn't
+// enough on its own to get in without also seeing the Telegram code.
+function getConfig() {
+  return {
+    hermesUrl: localStorage.getItem('hermes_url') || '',
+    sessionToken: localStorage.getItem('hermes_session_token') || '',
+    leoUrl: localStorage.getItem('leo_url') || 'https://liron-agent-production.up.railway.app'
+  };
+}
+
+function hasValidSession() {
+  const cfg = getConfig();
+  const exp = parseInt(localStorage.getItem('hermes_session_expires') || '0', 10);
+  return !!(cfg.hermesUrl && cfg.sessionToken && exp && Date.now() < exp);
+}
+
+// ── LOGIN FLOW (2-step OTP) ──
+let pendingSessionId = null;
+
+async function requestOtp() {
+  const hermesUrl = document.getElementById('loginHermesUrl').value.trim();
+  const token = document.getElementById('loginToken').value.trim();
+  const errEl = document.getElementById('loginStep1Error');
+  errEl.style.display = 'none';
+
+  if (!hermesUrl || !token) {
+    errEl.textContent = 'יש למלא כתובת URL וטוקן.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(hermesUrl + '/auth/request-otp', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!res.ok || !data.session_id) {
+      throw new Error(data.error || 'שגיאה לא ידועה');
+    }
+    // Remember hermesUrl now (needed for step 2) — the raw token is
+    // deliberately NOT kept anywhere past this point.
+    localStorage.setItem('hermes_url', hermesUrl);
+    pendingSessionId = data.session_id;
+    document.getElementById('loginStep1').style.display = 'none';
+    document.getElementById('loginStep2').style.display = 'block';
+    document.getElementById('loginSub').textContent = 'שלב 2: קוד מהטלגרם';
+    document.getElementById('loginOtpCode').focus();
+  } catch (e) {
+    errEl.textContent = 'שגיאת חיבור: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function verifyOtp() {
+  const code = document.getElementById('loginOtpCode').value.trim();
+  const errEl = document.getElementById('loginStep2Error');
+  errEl.style.display = 'none';
+  const cfg = getConfig();
+
+  if (!code) {
+    errEl.textContent = 'יש להזין את הקוד.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(cfg.hermesUrl + '/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: pendingSessionId, code })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.session_token) {
+      throw new Error(data.error || 'קוד שגוי');
+    }
+    localStorage.setItem('hermes_session_token', data.session_token);
+    // Session is valid for 12h server-side — mirror that client-side so
+    // hasValidSession() can proactively prompt re-login instead of the
+    // user discovering it via a failed request.
+    const expiresAt = Date.now() + 12 * 60 * 60 * 1000;
+    localStorage.setItem('hermes_session_expires', String(expiresAt));
+    sessionExpiresAt = expiresAt;
+
+    document.getElementById('loginOverlay').style.display = 'none';
+    checkHealth();
+    loadFiles();
+    loadProjects();
+    loadTasks();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function backToStep1() {
+  document.getElementById('loginStep2').style.display = 'none';
+  document.getElementById('loginStep1').style.display = 'block';
+  document.getElementById('loginSub').textContent = 'שלב 1: פרטי חיבור';
+  document.getElementById('loginToken').value = '';
+}
+
+function showLoginOverlay() {
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginHermesUrl').value = localStorage.getItem('hermes_url') || '';
+}
+
+function logout() {
+  localStorage.removeItem('hermes_session_token');
+  localStorage.removeItem('hermes_session_expires');
+  closeSettings();
+  backToStep1();
+  showLoginOverlay();
+}
+
+// Called whenever an authenticated API call comes back 401 — the session
+// expired or was invalidated server-side (Hermes restarted mid-day, etc.).
+function handleUnauthorized() {
+  logout();
+  addSystemMsgSafe('⚠️ החיבור פג — יש להתחבר מחדש.');
+}
+
+function addSystemMsgSafe(text) {
+  // Same as addSystemMsg, but safe to call even if the chat isn't
+  // visible yet (e.g. right after forcing a re-login).
+  try { addSystemMsg(text); } catch (e) {}
+}
+
+// ── INIT: show login overlay unless we already have a valid session ──
+if (hasValidSession()) {
+  document.getElementById('loginOverlay').style.display = 'none';
+  sessionExpiresAt = parseInt(localStorage.getItem('hermes_session_expires'), 10);
+  restoreTranscript();
+  loadProjects();
+  loadTasks();
+} else {
+  showLoginOverlay();
+}
+
+// ── CLOCK ──
+document.getElementById('initTime').textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
+
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('he-IL');
+  const e = Math.floor((Date.now() - startTime) / 1000);
+  const h = String(Math.floor(e/3600)).padStart(2,'0');
+  const m = String(Math.floor((e%3600)/60)).padStart(2,'0');
+  const s = String(e%60).padStart(2,'0');
+  document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
+
+  // Proactively catch session expiry between requests, not just on the
+  // next failed call.
+  if (sessionExpiresAt && Date.now() > sessionExpiresAt && document.getElementById('loginOverlay').style.display === 'none') {
+    handleUnauthorized();
+  }
+}, 1000);
+
+// ── HEALTH CHECK (read-only — never used to send tasks) ──
+async function checkHealth() {
+  const cfg = getConfig();
+  try {
+    if (cfg.hermesUrl) {
+      await fetch(cfg.hermesUrl + '/health');
+      document.getElementById('hermesStatusDot').className = 'dot online';
+      document.getElementById('hermesStatusLabel').textContent = 'Hermes ●';
+    }
+  } catch { document.getElementById('hermesStatusDot').className = 'dot offline'; }
+
+  try {
+    await fetch(cfg.leoUrl + '/health');
+    document.getElementById('leoDot').className = 'dot online';
+  } catch { document.getElementById('leoDot').className = 'dot offline'; }
+}
+
+checkHealth();
+setInterval(checkHealth, 30000);
+
+// ── TABS ──
+function showTab(name, el, fromMobile) {
+  document.querySelectorAll('.tab-view, .network-view').forEach(t => {
+    t.classList.remove('visible');
+  });
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('visible');
+
+  // Keep both the desktop topbar and the mobile tab bar in sync
+  document.querySelectorAll('.topbar-center .nav-pill, .mobile-tabbar .nav-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll(`.topbar-center .nav-pill, .mobile-tabbar .nav-pill`).forEach(p => {
+    if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(`'${name}'`)) p.classList.add('active');
+  });
+
+  if (name === 'network') drawNetwork();
+  if (name === 'files') loadFiles();
+  if (name === 'projects') loadProjects();
+  if (name === 'tasks') loadTasks();
+  if (fromMobile) closeDrawers();
+}
+
+// ── MOBILE DRAWERS ──
+function toggleDrawer(which) {
+  const el = document.querySelector(which === 'sidebar' ? '.sidebar' : '.chat-panel');
+  const overlay = document.getElementById('drawerOverlay');
+  const isOpen = el.classList.contains('open');
+  closeDrawers();
+  if (!isOpen) {
+    el.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeDrawers() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.chat-panel').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+// ── CONTEXT ──
+function setContext(name) {
+  currentContext = name;
+  document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
+  closeDrawers();
+}
+
+function setCtx(el, name) {
+  document.querySelectorAll('.ctx-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentContext = name;
+}
+
+// ── AGENT SWITCH ──
+// "Leo" is a VIEW filter only — every message still goes to Hermes.
+// Leo never receives instructions directly from this UI; only Hermes
+// decides (via [AGENT TASK]) whether and what to delegate to him.
+function switchAgent(agent, el) {
+  currentAgent = agent;
+  if (el) {
+    document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  const icon = document.getElementById('chatAgentIcon');
+  const name = document.getElementById('chatAgentName');
+  const status = document.getElementById('chatAgentStatus');
+  const hint = document.getElementById('inputHint');
+  if (agent === 'hermes') {
+    icon.textContent = '🧠'; name.textContent = 'Hermes'; status.textContent = '● מוח ראשי';
+    status.style.color = 'var(--accent)';
+    hint.textContent = 'Enter לשליחה · Shift+Enter לשורה חדשה';
+  } else {
+    icon.textContent = '⚙️'; name.textContent = 'Leo'; status.textContent = '● תפעול (רק דרך Hermes)';
+    status.style.color = 'var(--cyan)';
+    hint.textContent = 'הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-Leo';
+    addSystemMsg('ℹ️ אין שיחה ישירה עם Leo. כל הודעה עוברת דרך Hermes, שמחליט אם להאציל ל-Leo.');
+  }
+}
+
+// ── TASK TOGGLE (real — calls /tasks/toggle, then re-renders from fresh data) ──
+async function toggleTask(taskId) {
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) return;
+  try {
+    const res = await fetch(cfg.hermesUrl + '/tasks/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.sessionToken}` },
+      body: JSON.stringify({ id: taskId })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    if (data.error) { addSystemMsg('⚠️ עדכון המשימה נכשל: ' + data.error); return; }
+    await loadTasks();
+  } catch (e) {
+    addSystemMsg('⚠️ שגיאת חיבור בעדכון המשימה.');
+  }
+}
+
+// ── SETTINGS (now just shows connection status + logout) ──
+function openSettings() {
+  const cfg = getConfig();
+  document.getElementById('settingsCurrentUrl').textContent = cfg.hermesUrl || '—';
+  const exp = parseInt(localStorage.getItem('hermes_session_expires') || '0', 10);
+  document.getElementById('settingsSessionExpiry').textContent = exp ? new Date(exp).toLocaleString('he-IL') : '—';
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
+}
+
+// ── CHAT ──
+// EVERY message — regardless of which agent chip is selected — goes to
+// Hermes's /chat endpoint, authenticated with the OTP session_token (never
+// the raw BACKOFFICE_TOKEN, which is only ever used once during login).
+// Hermes alone decides whether to delegate to Leo via [AGENT TASK]. There
+// is intentionally no code path here that sends a task directly to Leo's
+// /task endpoint, and no direct-to-Anthropic fallback that would bypass
+// Hermes entirely.
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  input.value = '';
+
+  addMsg(msg, 'user');
+  chatHistory.push({ role: 'user', content: `[${currentContext}] ${msg}` });
+
+  const typingId = addTyping();
+  const cfg = getConfig();
+
+  try {
+    if (!cfg.hermesUrl || !cfg.sessionToken) {
+      throw new Error('no-session');
+    }
+
+    const res = await fetch(cfg.hermesUrl + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.sessionToken}` },
+      body: JSON.stringify({ message: msg, user_id: 'backoffice', context: currentContext })
+    });
+
+    if (res.status === 401) {
+      removeTyping(typingId);
+      handleUnauthorized();
+      btn.disabled = false;
+      return;
+    }
+
+    const data = await res.json();
+    const reply = data.response || 'שגיאה בתשובה';
+
+    removeTyping(typingId);
+    // Messages are always rendered as coming from Hermes — Leo never
+    // replies directly in this UI.
+    addMsg(reply, 'agent');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+
+  } catch (e) {
+    removeTyping(typingId);
+    addSystemMsg('⚠️ שגיאת חיבור ל-Hermes. נסה להתחבר מחדש (⚙ → התנתק).');
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+
+function addMsg(text, role) {
+  const chat = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
+  const tag = role === 'leo' ? '<span class="leo-tag">Leo ⚙️</span>' : role === 'agent' ? '<span class="agent-tag">Hermes 🧠</span>' : '';
+  div.innerHTML = (tag ? `<div class="msg-header">${tag}</div>` : '') + text.replace(/\n/g, '<br>') + `<div class="msg-time">${time}</div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  saveTranscript({ kind: 'msg', role, text, time });
+}
+
+function addSystemMsg(text) {
+  const chat = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.style.cssText = 'text-align:center;font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;padding:6px;';
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  saveTranscript({ kind: 'system', text });
+}
+
+// ── TRANSCRIPT PERSISTENCE ──
+// The backend (Hermes) already remembers the full conversation regardless
+// of this — get_history() reads it back from Supabase every time. This is
+// purely about what's ON SCREEN: a backgrounded/reloaded mobile tab wipes
+// the in-memory DOM and chatHistory array, making it LOOK like the
+// conversation was forgotten even though the server never lost it. Capped
+// at the last 40 entries so localStorage never grows unbounded.
+const TRANSCRIPT_KEY = 'hermes_transcript';
+const TRANSCRIPT_MAX = 40;
+
+function saveTranscript(entry) {
+  try {
+    const log = JSON.parse(localStorage.getItem(TRANSCRIPT_KEY) || '[]');
+    log.push(entry);
+    while (log.length > TRANSCRIPT_MAX) log.shift();
+    localStorage.setItem(TRANSCRIPT_KEY, JSON.stringify(log));
+  } catch (e) {}
+}
+
+function restoreTranscript() {
+  let log;
+  try {
+    log = JSON.parse(localStorage.getItem(TRANSCRIPT_KEY) || '[]');
+  } catch (e) {
+    return;
+  }
+  if (!log.length) return;
+
+  // Replace the default welcome message with the real saved transcript —
+  // re-using addMsg/addSystemMsg's OWN rendering logic (via a temporary
+  // suppression flag) would double-save, so render directly here instead.
+  const chat = document.getElementById('chatMessages');
+  chat.innerHTML = '';
+  log.forEach(entry => {
+    if (entry.kind === 'system') {
+      const div = document.createElement('div');
+      div.style.cssText = 'text-align:center;font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;padding:6px;';
+      div.textContent = entry.text;
+      chat.appendChild(div);
+    } else {
+      const div = document.createElement('div');
+      div.className = `msg ${entry.role}`;
+      const tag = entry.role === 'leo' ? '<span class="leo-tag">Leo ⚙️</span>' : entry.role === 'agent' ? '<span class="agent-tag">Hermes 🧠</span>' : '';
+      div.innerHTML = (tag ? `<div class="msg-header">${tag}</div>` : '') + entry.text.replace(/\n/g, '<br>') + `<div class="msg-time">${entry.time || ''}</div>`;
+      chat.appendChild(div);
+    }
+  });
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addTyping() {
+  const chat = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  const id = 'typing_' + Date.now();
+  div.id = id;
+  div.className = 'msg agent';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+// ── NETWORK VISUALIZATION ──
+function drawNetwork() {
+  const canvas = document.getElementById('networkCanvas');
+  if (!canvas) return;
+  const container = document.getElementById('tab-network');
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
+  const ctx = canvas.getContext('2d');
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  const agents = [
+    { name: 'Hermes', role: 'מוח ראשי', color: '#6c63ff', x: cx, y: cy, r: 40, icon: '🧠' },
+    { name: 'Leo', role: 'תפעול', color: '#00e5cc', x: cx - 200, y: cy - 80, r: 30, icon: '⚙️' },
+    { name: '+ סוכן', role: 'עתידי', color: '#5a5a7a', x: cx + 200, y: cy - 80, r: 25, icon: '+' },
+    { name: '+ סוכן', role: 'עתידי', color: '#5a5a7a', x: cx + 180, y: cy + 120, r: 25, icon: '+' },
+  ];
+
+  const projects = [
+    { name: 'Abundance', color: '#ffb020', x: cx - 280, y: cy + 80 },
+    { name: 'Jon Jon', color: '#6c63ff', x: cx - 160, y: cy + 160 },
+    { name: 'Seranova', color: '#00e5cc', x: cx + 40, y: cy + 180 },
+    { name: 'Trading Bot', color: '#ff4d6d', x: cx - 320, y: cy - 60 },
+  ];
+
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+
+    agents.slice(1).forEach(agent => {
+      if (agent.color === '#5a5a7a') return;
+      ctx.save();
+      ctx.setLineDash([4, 6]);
+      ctx.lineDashOffset = -frame * 0.3;
+      ctx.strokeStyle = agent.color + '60';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(agents[0].x, agents[0].y);
+      ctx.lineTo(agent.x, agent.y);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    projects.forEach(p => {
+      ctx.save();
+      ctx.setLineDash([2, 8]);
+      ctx.strokeStyle = p.color + '40';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(agents[1].x, agents[1].y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    projects.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + '20';
+      ctx.fill();
+      ctx.strokeStyle = p.color + '60';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = p.color;
+      ctx.font = '11px Space Grotesk';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.name, p.x, p.y + 30);
+    });
+
+    agents.forEach(agent => {
+      const pulse = Math.sin(frame * 0.05) * 4;
+
+      if (agent.color !== '#5a5a7a') {
+        ctx.beginPath();
+        ctx.arc(agent.x, agent.y, agent.r + 8 + pulse, 0, Math.PI * 2);
+        ctx.fillStyle = agent.color + '15';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(agent.x, agent.y, agent.r, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color === '#5a5a7a' ? '#1a1a2e' : agent.color + '25';
+      ctx.fill();
+      ctx.strokeStyle = agent.color;
+      ctx.lineWidth = agent.color === '#5a5a7a' ? 1 : 2;
+      ctx.stroke();
+
+      ctx.font = `${agent.r * 0.8}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = agent.color === '#5a5a7a' ? '#5a5a7a' : 'white';
+      ctx.fillText(agent.icon, agent.x, agent.y);
+
+      ctx.font = '13px Space Grotesk';
+      ctx.fillStyle = agent.color;
+      ctx.textBaseline = 'top';
+      ctx.fillText(agent.name, agent.x, agent.y + agent.r + 8);
+      ctx.font = '10px JetBrains Mono';
+      ctx.fillStyle = '#5a5a7a';
+      ctx.fillText(agent.role, agent.x, agent.y + agent.r + 24);
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+// ── FILES ──
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleFileSelected(event) {
+  const file = event.target.files[0];
+  event.target.value = ''; // allow selecting the same file again later
+  if (!file) return;
+
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) {
+    addSystemMsg('⚠️ יש להתחבר קודם (⚙ → התנתק, ואז התחבר מחדש).');
+    return;
+  }
+
+  addSystemMsg(`📎 מעלה ${file.name}...`);
+  try {
+    const content_base64 = await fileToBase64(file);
+    const res = await fetch(cfg.hermesUrl + '/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.sessionToken}` },
+      body: JSON.stringify({ filename: file.name, mimetype: file.type || 'application/octet-stream', content_base64 })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    if (data.link) {
+      addMsg(`📎 <a href="${data.link}" target="_blank" style="color:var(--cyan)">${file.name}</a> הועלה בהצלחה`, 'user');
+    } else {
+      addSystemMsg(`⚠️ העלאה נכשלה: ${data.error || 'שגיאה לא ידועה'}`);
+    }
+  } catch (e) {
+    addSystemMsg('⚠️ שגיאת חיבור בהעלאת הקובץ.');
+  }
+}
+
+async function loadFiles() {
+  const list = document.getElementById('filesList');
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">יש להתחבר קודם</div>';
+    return;
+  }
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">טוען...</div>';
+  try {
+    const res = await fetch(cfg.hermesUrl + '/files', {
+      headers: { 'Authorization': `Bearer ${cfg.sessionToken}` }
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    const files = data.files || [];
+    if (files.length === 0) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">אין קבצים עדיין</div>';
+      return;
+    }
+    list.innerHTML = files.map(f => `
+      <div class="task-row" onclick="window.open('${f.webViewLink}', '_blank')">
+        <div class="task-body">
+          <div class="task-title">${f.name}</div>
+          <div class="task-project">${f.mimeType || ''} · ${new Date(f.createdTime).toLocaleString('he-IL')}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = '<div style="text-align:center;color:var(--danger);font-size:12px;padding:20px">שגיאה בטעינת הקבצים</div>';
+  }
+}
+
+// ── PLACEHOLDERS ──
+// ── PROJECTS & TASKS (real data — replaces the old hardcoded mockup) ──
+let projectsCache = [];
+let tasksCache = [];
+
+const STATUS_LABELS = { active: 'פעיל', dev: 'פיתוח', paused: 'מושהה' };
+
+async function loadProjects() {
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) return;
+  try {
+    const res = await fetch(cfg.hermesUrl + '/projects', {
+      headers: { 'Authorization': `Bearer ${cfg.sessionToken}` }
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    projectsCache = data.projects || [];
+    renderProjects();
+  } catch (e) {
+    console.error('loadProjects failed', e);
+  }
+}
+
+async function loadTasks() {
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) return;
+  try {
+    const res = await fetch(cfg.hermesUrl + '/tasks', {
+      headers: { 'Authorization': `Bearer ${cfg.sessionToken}` }
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    tasksCache = data.tasks || [];
+    renderTasks();
+  } catch (e) {
+    console.error('loadTasks failed', e);
+  }
+}
+
+function projectNameById(id) {
+  const p = projectsCache.find(p => p.id === id);
+  return p ? `${p.emoji || '📁'} ${p.name}` : '—';
+}
+
+function renderProjects() {
+  const sidebarHtml = projectsCache.map(p => `
+    <div class="project-card" onclick="setContext('${p.name.replace(/'/g, "\\'")}')">
+      <div class="pc-top">
+        <div class="pc-name">${p.emoji || '📁'} ${p.name}</div>
+        <span class="status-badge ${p.status || 'dev'}">${STATUS_LABELS[p.status] || p.status || ''}</span>
+      </div>
+      <div class="pc-meta">${p.description || ''}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p.progress_percent || 0}%"></div></div>
+    </div>
+  `).join('');
+  document.getElementById('sidebarProjectsList').innerHTML = sidebarHtml;
+
+  const tileHtml = projectsCache.map(p => `
+    <div class="project-tile" onclick="setContext('${p.name.replace(/'/g, "\\'")}')">
+      <div class="pt-header">
+        <div class="pt-title">${p.emoji || '📁'} ${p.name}</div>
+        <span class="status-badge ${p.status || 'dev'}">${STATUS_LABELS[p.status] || p.status || ''}</span>
+      </div>
+      <div class="pt-desc">${p.description || ''}</div>
+      <div class="pt-progress"><div class="pt-fill" style="width:${p.progress_percent || 0}%"></div></div>
+    </div>
+  `).join('') + `
+    <div class="project-tile add-new" onclick="addProject()">
+      <span style="font-size:20px">+</span>
+      <span>פרויקט חדש</span>
+    </div>
+  `;
+  document.getElementById('dashProjectsGrid').innerHTML = tileHtml;
+  document.getElementById('allProjectsGrid').innerHTML = tileHtml;
+}
+
+function renderTasks() {
+  const openCount = tasksCache.filter(t => !t.done).length;
+  const openTasksEl = document.getElementById('openTasks');
+  if (openTasksEl) openTasksEl.textContent = openCount;
+
+  function taskRowHtml(t) {
+    const proj = projectNameById(t.project_id);
+    const checkClass = t.done ? 'task-check done' : 'task-check';
+    const checkMark = t.done ? '✓' : '';
+    const titleStyle = t.done ? 'text-decoration:line-through;opacity:0.5' : '';
+    return `
+      <div class="task-row">
+        <div class="${checkClass}" onclick="toggleTask(${t.id})">${checkMark}</div>
+        <div class="task-body">
+          <div class="task-title" style="${titleStyle}">${t.title}</div>
+          <div class="task-project">${proj}</div>
+        </div>
+        <div class="task-agent">${t.assigned_to || 'ידני'}</div>
+      </div>
+    `;
+  }
+
+  const activeHtml = tasksCache.filter(t => !t.done).slice(0, 5).map(taskRowHtml).join('')
+    || '<div style="text-align:center;color:var(--muted);font-size:12px;padding:16px">אין משימות פתוחות</div>';
+  document.getElementById('dashTasksList').innerHTML = activeHtml;
+
+  const allHtml = tasksCache.map(taskRowHtml).join('')
+    || '<div style="text-align:center;color:var(--muted);font-size:12px;padding:16px">אין משימות עדיין</div>';
+  document.getElementById('allTasksList').innerHTML = allHtml;
+}
+
+async function addProject() {
+  const name = prompt('שם הפרויקט:');
+  if (!name || !name.trim()) return;
+  const emoji = prompt('אימוג׳י (אופציונלי, ברירת מחדל 📁):') || '📁';
+  const description = prompt('תיאור קצר (אופציונלי):') || '';
+
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) {
+    addSystemMsg('⚠️ יש להתחבר קודם.');
+    return;
+  }
+  try {
+    const res = await fetch(cfg.hermesUrl + '/projects/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.sessionToken}` },
+      body: JSON.stringify({ name: name.trim(), emoji: emoji.trim(), description: description.trim() })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    if (data.error) { addSystemMsg('⚠️ יצירת הפרויקט נכשלה: ' + data.error); return; }
+    await loadProjects();
+  } catch (e) {
+    addSystemMsg('⚠️ שגיאת חיבור ביצירת הפרויקט.');
+  }
+}
+
+async function addTask() {
+  const title = prompt('תיאור המשימה:');
+  if (!title || !title.trim()) return;
+
+  let project_id = null;
+  if (projectsCache.length) {
+    const options = projectsCache.map((p, i) => `${i + 1}. ${p.emoji || '📁'} ${p.name}`).join('\n');
+    const choice = prompt(`שייך לפרויקט (מספר, או השאר ריק לדלג):\n${options}`);
+    const idx = parseInt(choice, 10) - 1;
+    if (!isNaN(idx) && projectsCache[idx]) project_id = projectsCache[idx].id;
+  }
+  const assigned_to = prompt('מבוצע ע"י (ידני / Leo / ים, אופציונלי):') || 'ידני';
+
+  const cfg = getConfig();
+  if (!cfg.hermesUrl || !cfg.sessionToken) {
+    addSystemMsg('⚠️ יש להתחבר קודם.');
+    return;
+  }
+  try {
+    const res = await fetch(cfg.hermesUrl + '/tasks/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.sessionToken}` },
+      body: JSON.stringify({ title: title.trim(), project_id, assigned_to: assigned_to.trim() })
+    });
+    if (res.status === 401) { handleUnauthorized(); return; }
+    const data = await res.json();
+    if (data.error) { addSystemMsg('⚠️ יצירת המשימה נכשלה: ' + data.error); return; }
+    await loadTasks();
+  } catch (e) {
+    addSystemMsg('⚠️ שגיאת חיבור ביצירת המשימה.');
+  }
+}
+
+function addAgent() { addSystemMsg('💬 פנה אל Hermes לבניית סוכן חדש'); }
+</script>
 </body>
 </html>
