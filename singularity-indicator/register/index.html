@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Singularity — Before You Continue</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #030B1C;
+  color: #EAF2FB;
+  font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.card {
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(160deg,#0C2244,#071630);
+  border: 1px solid rgba(127,196,255,.16);
+  border-radius: 16px;
+  padding: 32px 28px;
+}
+.eyebrow {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #E8B84B;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+h1 {
+  font-family: 'Archivo', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  color: #EAF2FB;
+}
+.disclaimer-box {
+  background: #030B1C;
+  border: 1px solid rgba(127,196,255,.2);
+  border-radius: 10px;
+  padding: 18px 20px;
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #93AFC9;
+  margin-bottom: 22px;
+}
+.disclaimer-box p { margin-bottom: 12px; }
+.disclaimer-box p:last-child { margin-bottom: 0; }
+.disclaimer-box strong { color: #C6D8EA; }
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+.check-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: #E8B84B;
+  cursor: pointer;
+}
+.check-row span {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #EAF2FB;
+}
+.continue-btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg,#3a4556,#2a3342);
+  color: #6E8395;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  text-decoration: none;
+  cursor: not-allowed;
+  transition: all 0.15s;
+  pointer-events: none;
+}
+.continue-btn.enabled {
+  background: linear-gradient(135deg,#E8B84B,#F7DC91);
+  color: #071630;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.continue-btn.enabled:hover { opacity: 0.9; }
+.hint {
+  text-align: center;
+  font-size: 12px;
+  color: #6E8395;
+  margin-top: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="eyebrow">Before you continue</div>
+  <h1>Please read and accept the risk disclaimer</h1>
+
+  <div class="disclaimer-box">
+    <p><strong>Risk disclaimer.</strong> Trading financial instruments involves substantial risk and is not suitable for every investor. You may lose some or all of your invested capital. Singularity Indicator provides analytical tools and market signals for informational purposes only. Nothing on this page, in the signal channel, or anywhere else Singularity communicates constitutes financial, investment, legal, or tax advice, or a recommendation to enter any position. Past signal performance does not indicate future results.</p>
+    <p><strong>Leverage warning.</strong> Leveraged products, including perpetual futures and CFDs, carry a high risk of rapid loss. Consider whether you understand how these instruments work and whether you can afford the risk before trading them.</p>
+    <p><strong>No automation, no guarantees.</strong> Signals are informational only — there is no automated execution, no win-rate guarantee, and no promise of profit. Every trading decision, including whether to act on a signal at all, is yours alone.</p>
+    <p><strong>Independence.</strong> Singularity Indicator is an independent product and is not affiliated with, endorsed by, or connected to TradingView, Telegram, or any exchange or broker. Product names and trademarks belong to their respective owners and are referenced for compatibility only.</p>
+  </div>
+
+  <label class="check-row">
+    <input type="checkbox" id="acceptCheck">
+    <span>I have read and accept the risk disclaimer above.</span>
+  </label>
+
+  <a href="https://whop.com/abundance-for-all/singularity-indicator-a9/" class="continue-btn" id="continueBtn">Continue to checkout</a>
+  <p class="hint">You won't be able to continue until the box above is checked.</p>
+</div>
+
+<script>
+const checkbox = document.getElementById('acceptCheck');
+const btn = document.getElementById('continueBtn');
+checkbox.addEventListener('change', function() {
+  if (this.checked) {
+    btn.classList.add('enabled');
+  } else {
+    btn.classList.remove('enabled');
+  }
+});
+</script>
+
+</body>
+</html>
