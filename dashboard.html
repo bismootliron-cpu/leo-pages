@@ -620,6 +620,114 @@ body {
 .modal-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
 .modal-btn:hover { opacity: 0.85; }
 
+
+/* Project detail modal */
+.modal.project-modal {
+  width: min(720px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  gap: 14px;
+}
+.modal-field select,
+.modal-field textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Space Grotesk', sans-serif;
+  outline: none;
+  resize: vertical;
+}
+.modal-field select { font-family: 'JetBrains Mono', monospace; cursor: pointer; }
+.modal-field select:focus,
+.modal-field textarea:focus { border-color: var(--accent); }
+.modal-field textarea { min-height: 72px; line-height: 1.5; }
+.progress-edit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.progress-edit input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.progress-edit .prog-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--cyan);
+  min-width: 42px;
+  text-align: left;
+}
+.modal-progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.modal-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  transition: width 0.2s;
+}
+.modal-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.modal-task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.modal-task-row .task-check { cursor: pointer; }
+.modal-task-text {
+  flex: 1;
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  outline: none;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.modal-task-text.done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+.modal-task-del {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+}
+.modal-task-del:hover { color: var(--danger); }
+.modal-btns.spread { justify-content: space-between; width: 100%; }
+.modal-btns .btn-group { display: flex; gap: 10px; }
+.modal-btn.danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.modal-btn.danger:hover { background: rgba(255,77,109,0.12); opacity: 1; }
+.modal-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -650,6 +758,56 @@ body {
   </div>
 </div>
 
+<!-- PROJECT DETAIL MODAL -->
+<div class="modal-overlay" id="projectModal" style="display:none" onclick="if(event.target===this)closeProjectModal()">
+  <div class="modal project-modal" onclick="event.stopPropagation()">
+    <div>
+      <div class="modal-title" id="projectModalTitle">📁 פרטי פרויקט</div>
+      <div class="modal-sub" id="projectModalSub">עריכה ושמירה</div>
+    </div>
+    <input type="hidden" id="pmId">
+    <div class="modal-row-2">
+      <div class="modal-field">
+        <label>שם הפרויקט</label>
+        <input id="pmName" placeholder="שם הפרויקט">
+      </div>
+      <div class="modal-field">
+        <label>סטטוס</label>
+        <select id="pmStatus">
+          <option value="active">פעיל</option>
+          <option value="paused">מושהה</option>
+          <option value="dev">פיתוח</option>
+          <option value="done">הושלם</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>תיאור</label>
+      <textarea id="pmDesc" placeholder="תיאור קצר של הפרויקט..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label>התקדמות</label>
+      <div class="progress-edit">
+        <input type="range" id="pmProgress" min="0" max="100" value="0" oninput="onProgressSlider(this.value)">
+        <span class="prog-pct" id="pmProgressLabel">0%</span>
+      </div>
+      <div class="modal-progress-bar"><div class="modal-progress-fill" id="pmProgressBar" style="width:0%"></div></div>
+    </div>
+    <div class="modal-field">
+      <label>משימות</label>
+      <div class="modal-tasks" id="pmTasks"></div>
+      <button type="button" class="modal-btn" style="margin-top:8px;align-self:flex-start" onclick="addModalTask()">+ משימה</button>
+    </div>
+    <div class="modal-btns spread">
+      <button class="modal-btn danger" id="pmDeleteBtn" onclick="deleteProject()">מחק פרויקט</button>
+      <div class="btn-group">
+        <button class="modal-btn" onclick="closeProjectModal()">סגור</button>
+        <button class="modal-btn primary" onclick="saveProject()">שמור</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">HERMES <span>OS</span></div>
@@ -675,54 +833,10 @@ body {
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-section">
+    <div class="sidebar-section" id="sidebarProjectsSection">
       <div class="section-label">פרויקטים</div>
-
-      <div class="project-card active" onclick="setContext('כל הפרויקטים')">
-        <div class="pc-top">
-          <div class="pc-name">📊 כל הפרויקטים</div>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" style="width:38%"></div></div>
-      </div>
-
-      <div class="project-card" onclick="setContext('Abundance for All')">
-        <div class="pc-top">
-          <div class="pc-name">📈 Abundance for All</div>
-          <span class="status-badge active">פעיל</span>
-        </div>
-        <div class="pc-meta">TradingView → Whop</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div>
-      </div>
-
-      <div class="project-card" onclick="setContext('Jon Jon')">
-        <div class="pc-top">
-          <div class="pc-name">🤖 Jon Jon</div>
-          <span class="status-badge dev">פיתוח</span>
-        </div>
-        <div class="pc-meta">AI Agent — X + TikTok</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:15%"></div></div>
-      </div>
-
-      <div class="project-card" onclick="setContext('Seranova')">
-        <div class="pc-top">
-          <div class="pc-name">✈️ Seranova</div>
-          <span class="status-badge dev">פיתוח</span>
-        </div>
-        <div class="pc-meta">US Travel Sweepstakes</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
-      </div>
-
-      <div class="project-card" onclick="setContext('Trading Bot')">
-        <div class="pc-top">
-          <div class="pc-name">🔁 Trading Bot</div>
-          <span class="status-badge dev">פיתוח</span>
-        </div>
-        <div class="pc-meta">Railway — CCI/RSI + MACD</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
-      </div>
-
-      <div class="project-card" style="border-style:dashed;opacity:0.5;cursor:pointer" onclick="addProject()">
-        <div style="text-align:center;color:var(--muted);font-size:12px;padding:4px">+ פרויקט חדש</div>
+      <div id="sidebarProjects">
+        <!-- rebuilt from PROJECTS_STORE -->
       </div>
     </div>
 
@@ -765,7 +879,7 @@ body {
       <div class="metrics-row">
         <div class="metric-card">
           <div class="mc-label">פרויקטים</div>
-          <div class="mc-value accent">4</div>
+          <div class="mc-value accent" id="metricProjectsCount">4</div>
         </div>
         <div class="metric-card">
           <div class="mc-label">סוכנים פעילים</div>
@@ -786,80 +900,8 @@ body {
           <div class="section-title">פרויקטים פעילים</div>
           <div class="section-action" onclick="showTab('projects')">הכל ←</div>
         </div>
-        <div class="projects-grid">
-          <div class="project-tile" onclick="setContext('Abundance for All')">
-            <div class="pt-header">
-              <div class="pt-title">📈 Abundance for All</div>
-              <span class="status-badge active">פעיל</span>
-            </div>
-            <div class="pt-desc">TradingView → TikTok → Whop $15/$49</div>
-            <div class="pt-metrics">
-              <div class="pt-metric">
-                <div class="pt-metric-val">0</div>
-                <div class="pt-metric-label">מנויים</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">$0</div>
-                <div class="pt-metric-label">MRR</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">35%</div>
-                <div class="pt-metric-label">התקדמות</div>
-              </div>
-            </div>
-            <div class="pt-progress"><div class="pt-fill" style="width:35%"></div></div>
-          </div>
-
-          <div class="project-tile" onclick="setContext('Trading Bot')">
-            <div class="pt-header">
-              <div class="pt-title">🔁 Trading Bot</div>
-              <span class="status-badge dev">פיתוח</span>
-            </div>
-            <div class="pt-desc">Python Railway — CCI/RSI + MACD</div>
-            <div class="pt-metrics">
-              <div class="pt-metric">
-                <div class="pt-metric-val">0</div>
-                <div class="pt-metric-label">עסקאות</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">—</div>
-                <div class="pt-metric-label">Win Rate</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">50%</div>
-                <div class="pt-metric-label">התקדמות</div>
-              </div>
-            </div>
-            <div class="pt-progress"><div class="pt-fill" style="width:50%"></div></div>
-          </div>
-
-          <div class="project-tile" onclick="setContext('Seranova')">
-            <div class="pt-header">
-              <div class="pt-title">✈️ Seranova</div>
-              <span class="status-badge dev">פיתוח</span>
-            </div>
-            <div class="pt-desc">US Travel Sweepstakes — Cloudflare + Supabase</div>
-            <div class="pt-metrics">
-              <div class="pt-metric">
-                <div class="pt-metric-val">0</div>
-                <div class="pt-metric-label">חברים</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">0</div>
-                <div class="pt-metric-label">הגרלות</div>
-              </div>
-              <div class="pt-metric">
-                <div class="pt-metric-val">40%</div>
-                <div class="pt-metric-label">התקדמות</div>
-              </div>
-            </div>
-            <div class="pt-progress"><div class="pt-fill" style="width:40%"></div></div>
-          </div>
-
-          <div class="project-tile add-new" onclick="addProject()">
-            <span style="font-size:20px">+</span>
-            <span>פרויקט חדש</span>
-          </div>
+        <div class="projects-grid" id="dashboardProjectsGrid">
+          <!-- rebuilt from PROJECTS_STORE -->
         </div>
       </div>
 
@@ -970,11 +1012,7 @@ body {
     </div>
 
     <div class="context-bar" id="contextBar">
-      <div class="ctx-chip active" onclick="setCtx(this,'כל הפרויקטים')">הכל</div>
-      <div class="ctx-chip" onclick="setCtx(this,'Abundance for All')">Abundance</div>
-      <div class="ctx-chip" onclick="setCtx(this,'Jon Jon')">Jon Jon</div>
-      <div class="ctx-chip" onclick="setCtx(this,'Seranova')">Seranova</div>
-      <div class="ctx-chip" onclick="setCtx(this,'Trading Bot')">Trading</div>
+      <!-- rebuilt from PROJECTS_STORE -->
     </div>
 
     <div class="chat-messages" id="chatMessages">
@@ -1004,6 +1042,590 @@ let currentAgent = 'hermes';
 let currentContext = 'כל הפרויקטים';
 let chatHistory = [];
 let startTime = Date.now();
+
+
+// ── PROJECTS STORE ──
+const PROJECTS_LS_KEY = 'hermes_projects_v1';
+let PROJECTS_STORE = [];
+let currentEditingProjectId = null;
+let modalTasksScratch = [];
+
+const STATUS_LABELS = {
+  active: 'פעיל',
+  paused: 'מושהה',
+  dev: 'פיתוח',
+  done: 'הושלם'
+};
+const STATUS_CLASS = {
+  active: 'active',
+  paused: 'paused',
+  dev: 'dev',
+  done: 'paused'
+};
+
+const SEED_PROJECTS = [
+  {
+    id: 'proj_abundance',
+    name: 'Abundance for All',
+    icon: '📈',
+    status: 'active',
+    description: 'TradingView → TikTok → Whop $15/$49',
+    meta: 'TradingView → Whop',
+    progress: 35,
+    tasks: [
+      { id: 't_ab_1', text: 'פתיחת מוצר ב-Whop עם חיבור TradingView', done: false },
+      { id: 't_ab_2', text: 'דף נחיתה ב-Cloudflare Pages', done: true }
+    ]
+  },
+  {
+    id: 'proj_jonjon',
+    name: 'Jon Jon',
+    icon: '🤖',
+    status: 'dev',
+    description: 'AI Agent — X + TikTok',
+    meta: 'AI Agent — X + TikTok',
+    progress: 15,
+    tasks: [
+      { id: 't_jj_1', text: 'יצירת חשבון X ל-Jon Jon', done: false }
+    ]
+  },
+  {
+    id: 'proj_seranova',
+    name: 'Seranova',
+    icon: '✈️',
+    status: 'dev',
+    description: 'US Travel Sweepstakes — Cloudflare + Supabase',
+    meta: 'US Travel Sweepstakes',
+    progress: 40,
+    tasks: [
+      { id: 't_se_1', text: 'חיבור Stripe לפלטפורמה', done: false }
+    ]
+  },
+  {
+    id: 'proj_trading',
+    name: 'Trading Bot',
+    icon: '🔁',
+    status: 'dev',
+    description: 'Python Railway — CCI/RSI + MACD',
+    meta: 'Railway — CCI/RSI + MACD',
+    progress: 50,
+    tasks: [
+      { id: 't_tb_1', text: 'בוט מסחר ל-Railway עם Webhook', done: false }
+    ]
+  }
+];
+
+function uid(prefix) {
+  return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+function cloneSeed() {
+  return JSON.parse(JSON.stringify(SEED_PROJECTS));
+}
+
+function loadProjectsFromLocal() {
+  try {
+    const raw = localStorage.getItem(PROJECTS_LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch (e) { /* ignore corrupt */ }
+  return cloneSeed();
+}
+
+function persistProjectsLocal() {
+  localStorage.setItem(PROJECTS_LS_KEY, JSON.stringify(PROJECTS_STORE));
+}
+
+function normalizeServerProject(p, idx) {
+  if (!p || typeof p !== 'object') return null;
+  const name = p.name || p.title || p.project_name || ('Project ' + (idx + 1));
+  const id = String(p.id || p.project_id || ('srv_' + name.replace(/\s+/g, '_').toLowerCase()));
+  let status = p.status || 'dev';
+  if (status === 'פעיל') status = 'active';
+  if (status === 'מושהה') status = 'paused';
+  if (status === 'פיתוח') status = 'dev';
+  if (status === 'הושלם' || status === 'completed') status = 'done';
+  if (!STATUS_LABELS[status]) status = 'dev';
+  const tasksRaw = p.tasks || p.task_list || [];
+  const tasks = (Array.isArray(tasksRaw) ? tasksRaw : []).map((t, i) => ({
+    id: String(t.id || ('t_' + id + '_' + i)),
+    text: t.text || t.title || t.name || 'משימה',
+    done: !!(t.done || t.completed || t.status === 'done')
+  }));
+  return {
+    id,
+    name,
+    icon: p.icon || '📁',
+    status,
+    description: p.description || p.desc || p.summary || '',
+    meta: p.meta || p.subtitle || (p.description || '').slice(0, 48),
+    progress: Math.max(0, Math.min(100, Number(p.progress != null ? p.progress : (p.percent != null ? p.percent : 0)) || 0)),
+    tasks
+  };
+}
+
+function mergeServerProjects(serverList) {
+  if (!Array.isArray(serverList)) {
+    if (serverList && typeof serverList === 'object') {
+      if (Array.isArray(serverList.projects)) serverList = serverList.projects;
+      else if (Array.isArray(serverList.data)) serverList = serverList.data;
+      else serverList = Object.values(serverList).filter(v => v && typeof v === 'object' && (v.name || v.title || v.id));
+    } else return;
+  }
+  const normalized = serverList.map(normalizeServerProject).filter(Boolean);
+  if (!normalized.length) return;
+  const byId = new Map(PROJECTS_STORE.map(p => [p.id, p]));
+  const byName = new Map(PROJECTS_STORE.map(p => [p.name.toLowerCase(), p]));
+  normalized.forEach(sp => {
+    const existing = byId.get(sp.id) || byName.get(sp.name.toLowerCase());
+    if (existing) {
+      Object.assign(existing, {
+        id: sp.id || existing.id,
+        name: sp.name,
+        status: sp.status,
+        description: sp.description || existing.description,
+        meta: sp.meta || existing.meta,
+        progress: sp.progress,
+        tasks: sp.tasks && sp.tasks.length ? sp.tasks : existing.tasks,
+        icon: sp.icon || existing.icon
+      });
+    } else {
+      PROJECTS_STORE.push(sp);
+    }
+  });
+  persistProjectsLocal();
+}
+
+async function fetchProjectsFromHermes() {
+  const cfg = getConfig();
+  if (!cfg.hermesUrl) return;
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects', {
+      headers: { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/json' }
+    });
+    if (!res.ok) {
+      addSystemMsg('ℹ️ טעינת פרויקטים מהשרת נכשלה (' + res.status + ') — נשאר מקומי');
+      return;
+    }
+    const data = await res.json();
+    mergeServerProjects(data);
+    renderAllProjectUI();
+    addSystemMsg('✅ פרויקטים סונכרנו מהשרת');
+  } catch (e) {
+    addSystemMsg('ℹ️ לא ניתן לסנכרן פרויקטים מהשרת — נשאר מקומי');
+  }
+}
+
+function findProject(nameOrId) {
+  if (!nameOrId) return null;
+  const key = String(nameOrId);
+  return PROJECTS_STORE.find(p => p.id === key || p.name === key) || null;
+}
+
+function avgProgress() {
+  if (!PROJECTS_STORE.length) return 0;
+  const sum = PROJECTS_STORE.reduce((a, p) => a + (Number(p.progress) || 0), 0);
+  return Math.round(sum / PROJECTS_STORE.length);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderSidebarProjects() {
+  const host = document.getElementById('sidebarProjects');
+  if (!host) return;
+  const avg = avgProgress();
+  let html = `
+      <div class="project-card ${currentContext === 'כל הפרויקטים' ? 'active' : ''}" onclick="setContext('כל הפרויקטים')">
+        <div class="pc-top">
+          <div class="pc-name">📊 כל הפרויקטים</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${avg}%"></div></div>
+      </div>`;
+  PROJECTS_STORE.forEach(p => {
+    const sc = STATUS_CLASS[p.status] || 'dev';
+    const sl = STATUS_LABELS[p.status] || p.status;
+    const active = currentContext === p.name ? 'active' : '';
+    html += `
+      <div class="project-card ${active}" onclick="openProject('${escapeHtml(p.id)}')">
+        <div class="pc-top">
+          <div class="pc-name">${escapeHtml(p.icon || '📁')} ${escapeHtml(p.name)}</div>
+          <span class="status-badge ${sc}">${escapeHtml(sl)}</span>
+        </div>
+        <div class="pc-meta">${escapeHtml(p.meta || p.description || '')}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Number(p.progress)||0}%"></div></div>
+      </div>`;
+  });
+  html += `
+      <div class="project-card" style="border-style:dashed;opacity:0.5;cursor:pointer" onclick="addProject()">
+        <div style="text-align:center;color:var(--muted);font-size:12px;padding:4px">+ פרויקט חדש</div>
+      </div>`;
+  host.innerHTML = html;
+}
+
+function renderDashboardTiles() {
+  const host = document.getElementById('dashboardProjectsGrid');
+  if (!host) return;
+  let html = '';
+  PROJECTS_STORE.forEach(p => {
+    const sc = STATUS_CLASS[p.status] || 'dev';
+    const sl = STATUS_LABELS[p.status] || p.status;
+    const prog = Number(p.progress) || 0;
+    html += `
+          <div class="project-tile" onclick="openProject('${escapeHtml(p.id)}')">
+            <div class="pt-header">
+              <div class="pt-title">${escapeHtml(p.icon || '📁')} ${escapeHtml(p.name)}</div>
+              <span class="status-badge ${sc}">${escapeHtml(sl)}</span>
+            </div>
+            <div class="pt-desc">${escapeHtml(p.description || p.meta || '')}</div>
+            <div class="pt-metrics">
+              <div class="pt-metric">
+                <div class="pt-metric-val">${(p.tasks||[]).length}</div>
+                <div class="pt-metric-label">משימות</div>
+              </div>
+              <div class="pt-metric">
+                <div class="pt-metric-val">${(p.tasks||[]).filter(t=>t.done).length}</div>
+                <div class="pt-metric-label">הושלמו</div>
+              </div>
+              <div class="pt-metric">
+                <div class="pt-metric-val">${prog}%</div>
+                <div class="pt-metric-label">התקדמות</div>
+              </div>
+            </div>
+            <div class="pt-progress"><div class="pt-fill" style="width:${prog}%"></div></div>
+          </div>`;
+  });
+  html += `
+          <div class="project-tile add-new" onclick="addProject()">
+            <span style="font-size:20px">+</span>
+            <span>פרויקט חדש</span>
+          </div>`;
+  host.innerHTML = html;
+}
+
+function renderAllProjectsGrid() {
+  const host = document.getElementById('allProjectsGrid');
+  if (!host) return;
+  let html = '';
+  PROJECTS_STORE.forEach(p => {
+    const sc = STATUS_CLASS[p.status] || 'dev';
+    const sl = STATUS_LABELS[p.status] || p.status;
+    const prog = Number(p.progress) || 0;
+    html += `
+          <div class="project-tile" onclick="openProject('${escapeHtml(p.id)}')">
+            <div class="pt-header">
+              <div class="pt-title">${escapeHtml(p.icon || '📁')} ${escapeHtml(p.name)}</div>
+              <span class="status-badge ${sc}">${escapeHtml(sl)}</span>
+            </div>
+            <div class="pt-desc">${escapeHtml(p.description || p.meta || '')}</div>
+            <div class="pt-metrics">
+              <div class="pt-metric">
+                <div class="pt-metric-val">${(p.tasks||[]).length}</div>
+                <div class="pt-metric-label">משימות</div>
+              </div>
+              <div class="pt-metric">
+                <div class="pt-metric-val">${prog}%</div>
+                <div class="pt-metric-label">התקדמות</div>
+              </div>
+            </div>
+            <div class="pt-progress"><div class="pt-fill" style="width:${prog}%"></div></div>
+          </div>`;
+  });
+  html += `
+          <div class="project-tile add-new" onclick="addProject()">
+            <span style="font-size:20px">+</span>
+            <span>פרויקט חדש</span>
+          </div>`;
+  host.innerHTML = html;
+}
+
+function renderContextChips() {
+  const bar = document.getElementById('contextBar');
+  if (!bar) return;
+  let html = `<div class="ctx-chip ${currentContext === 'כל הפרויקטים' ? 'active' : ''}" onclick="setCtx(this,'כל הפרויקטים')">הכל</div>`;
+  PROJECTS_STORE.forEach(p => {
+    const short = p.name.length > 12 ? p.name.split(' ')[0] : p.name;
+    html += `<div class="ctx-chip ${currentContext === p.name ? 'active' : ''}" onclick="setCtx(this,'${escapeHtml(p.name)}')">${escapeHtml(short)}</div>`;
+  });
+  bar.innerHTML = html;
+}
+
+function updateOpenTasksMetric() {
+  const open = PROJECTS_STORE.reduce((n, p) => n + (p.tasks || []).filter(t => !t.done).length, 0);
+  const el = document.getElementById('openTasks');
+  if (el) el.textContent = String(open);
+  const mc = document.getElementById('metricProjectsCount');
+  if (mc) mc.textContent = String(PROJECTS_STORE.length);
+}
+
+function renderAllProjectUI() {
+  renderSidebarProjects();
+  renderDashboardTiles();
+  renderAllProjectsGrid();
+  renderContextChips();
+  updateOpenTasksMetric();
+}
+
+function setContext(name) {
+  currentContext = name;
+  document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
+  // Highlight matching card by scanning names
+  document.querySelectorAll('#sidebarProjects .project-card').forEach(c => {
+    const nm = c.querySelector('.pc-name');
+    if (!nm) return;
+    const text = nm.textContent || '';
+    if (name === 'כל הפרויקטים' && text.includes('כל הפרויקטים')) c.classList.add('active');
+    else if (name !== 'כל הפרויקטים' && text.includes(name)) c.classList.add('active');
+  });
+  document.querySelectorAll('.ctx-chip').forEach(c => {
+    c.classList.toggle('active', (c.textContent === 'הכל' && name === 'כל הפרויקטים') || c.getAttribute('onclick')?.includes("'" + name + "'"));
+  });
+}
+
+function openProject(nameOrId) {
+  const p = findProject(nameOrId);
+  if (!p) {
+    addSystemMsg('⚠️ פרויקט לא נמצא');
+    return;
+  }
+  setContext(p.name);
+  currentEditingProjectId = p.id;
+  modalTasksScratch = JSON.parse(JSON.stringify(p.tasks || []));
+  document.getElementById('pmId').value = p.id;
+  document.getElementById('pmName').value = p.name;
+  document.getElementById('pmStatus').value = STATUS_LABELS[p.status] ? p.status : 'dev';
+  document.getElementById('pmDesc').value = p.description || '';
+  const prog = Number(p.progress) || 0;
+  document.getElementById('pmProgress').value = prog;
+  onProgressSlider(prog);
+  document.getElementById('projectModalTitle').textContent = (p.icon || '📁') + ' ' + p.name;
+  document.getElementById('projectModalSub').textContent = 'עריכת פרויקט';
+  document.getElementById('pmDeleteBtn').style.display = '';
+  renderModalTasks();
+  document.getElementById('projectModal').style.display = 'flex';
+}
+
+function closeProjectModal() {
+  document.getElementById('projectModal').style.display = 'none';
+  currentEditingProjectId = null;
+  modalTasksScratch = [];
+}
+
+function onProgressSlider(val) {
+  const v = Math.max(0, Math.min(100, Number(val) || 0));
+  document.getElementById('pmProgressLabel').textContent = v + '%';
+  document.getElementById('pmProgressBar').style.width = v + '%';
+}
+
+function renderModalTasks() {
+  const host = document.getElementById('pmTasks');
+  if (!host) return;
+  if (!modalTasksScratch.length) {
+    host.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px;text-align:center">אין משימות עדיין</div>';
+    return;
+  }
+  host.innerHTML = modalTasksScratch.map((t, i) => `
+    <div class="modal-task-row">
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleModalTask(${i})">${t.done ? '✓' : ''}</div>
+      <input class="modal-task-text ${t.done ? 'done' : ''}" value="${escapeHtml(t.text)}" onchange="modalTasksScratch[${i}].text=this.value">
+      <button type="button" class="modal-task-del" onclick="removeModalTask(${i})" title="מחק">×</button>
+    </div>
+  `).join('');
+}
+
+function toggleModalTask(idx) {
+  if (!modalTasksScratch[idx]) return;
+  modalTasksScratch[idx].done = !modalTasksScratch[idx].done;
+  // Auto-suggest progress from tasks when user toggles
+  const total = modalTasksScratch.length;
+  if (total > 0) {
+    const done = modalTasksScratch.filter(t => t.done).length;
+    const suggested = Math.round((done / total) * 100);
+    document.getElementById('pmProgress').value = suggested;
+    onProgressSlider(suggested);
+  }
+  renderModalTasks();
+  // Persist immediately into store + localStorage
+  applyModalFieldsToStore(false);
+  persistProjectsLocal();
+  renderAllProjectUI();
+}
+
+function removeModalTask(idx) {
+  modalTasksScratch.splice(idx, 1);
+  renderModalTasks();
+}
+
+function addModalTask() {
+  modalTasksScratch.push({ id: uid('t'), text: 'משימה חדשה', done: false });
+  renderModalTasks();
+  const inputs = document.querySelectorAll('#pmTasks .modal-task-text');
+  if (inputs.length) {
+    const last = inputs[inputs.length - 1];
+    last.focus();
+    last.select();
+  }
+}
+
+function applyModalFieldsToStore(createIfMissing) {
+  const id = document.getElementById('pmId').value || currentEditingProjectId;
+  const name = document.getElementById('pmName').value.trim();
+  const status = document.getElementById('pmStatus').value;
+  const description = document.getElementById('pmDesc').value.trim();
+  const progress = Number(document.getElementById('pmProgress').value) || 0;
+  // sync task text from inputs
+  document.querySelectorAll('#pmTasks .modal-task-text').forEach((inp, i) => {
+    if (modalTasksScratch[i]) modalTasksScratch[i].text = inp.value;
+  });
+  let p = id ? findProject(id) : null;
+  if (!p && name) p = findProject(name);
+  if (!p && createIfMissing) {
+    p = {
+      id: id || uid('proj'),
+      name: name || 'פרויקט חדש',
+      icon: '📁',
+      status,
+      description,
+      meta: description.slice(0, 48),
+      progress,
+      tasks: JSON.parse(JSON.stringify(modalTasksScratch))
+    };
+    PROJECTS_STORE.push(p);
+    currentEditingProjectId = p.id;
+    document.getElementById('pmId').value = p.id;
+    return p;
+  }
+  if (!p) return null;
+  p.name = name || p.name;
+  p.status = status;
+  p.description = description;
+  p.meta = description.slice(0, 48) || p.meta;
+  p.progress = progress;
+  p.tasks = JSON.parse(JSON.stringify(modalTasksScratch));
+  return p;
+}
+
+async function saveProject() {
+  const name = document.getElementById('pmName').value.trim();
+  if (!name) {
+    addSystemMsg('⚠️ יש להזין שם פרויקט');
+    return;
+  }
+  const p = applyModalFieldsToStore(true);
+  if (!p) {
+    addSystemMsg('⚠️ לא ניתן לשמור את הפרויקט');
+    return;
+  }
+  persistProjectsLocal();
+  renderAllProjectUI();
+  setContext(p.name);
+
+  const cfg = getConfig();
+  if (!cfg.hermesUrl) {
+    addSystemMsg('💾 נשמר מקומית (אין Hermes URL)');
+    closeProjectModal();
+    return;
+  }
+
+  const payload = {
+    action: 'update',
+    project: {
+      id: p.id,
+      name: p.name,
+      status: p.status,
+      description: p.description,
+      progress: p.progress,
+      tasks: (p.tasks || []).map(t => ({ id: t.id, text: t.text, done: !!t.done }))
+    },
+    id: p.id,
+    name: p.name,
+    status: p.status,
+    description: p.description,
+    progress: p.progress,
+    tasks: (p.tasks || []).map(t => ({ id: t.id, text: t.text, done: !!t.done }))
+  };
+
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cfg.token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      addSystemMsg('✅ הפרויקט נשמר מקומית ובשרת');
+    } else {
+      addSystemMsg('💾 נשמר מקומית · השרת החזיר ' + res.status);
+    }
+  } catch (e) {
+    addSystemMsg('💾 נשמר מקומית · שגיאת רשת בעדכון השרת');
+  }
+  closeProjectModal();
+}
+
+async function deleteProject() {
+  const id = document.getElementById('pmId').value || currentEditingProjectId;
+  const p = findProject(id) || findProject(document.getElementById('pmName').value.trim());
+  if (!p) {
+    closeProjectModal();
+    return;
+  }
+  if (!window.confirm('למחוק את הפרויקט "' + p.name + '"? פעולה זו אינה ניתנת לביטול.')) return;
+
+  PROJECTS_STORE = PROJECTS_STORE.filter(x => x.id !== p.id);
+  persistProjectsLocal();
+  if (currentContext === p.name) currentContext = 'כל הפרויקטים';
+  renderAllProjectUI();
+  closeProjectModal();
+
+  const cfg = getConfig();
+  if (!cfg.hermesUrl) {
+    addSystemMsg('🗑️ הפרויקט נמחק מקומית');
+    return;
+  }
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cfg.token}`
+      },
+      body: JSON.stringify({ action: 'delete', project: { id: p.id, name: p.name } })
+    });
+    if (res.ok) addSystemMsg('🗑️ הפרויקט נמחק מקומית ובשרת');
+    else addSystemMsg('🗑️ נמחק מקומית · השרת החזיר ' + res.status);
+  } catch (e) {
+    addSystemMsg('🗑️ נמחק מקומית · שגיאת רשת במחיקה בשרת');
+  }
+}
+
+function addProject() {
+  currentEditingProjectId = null;
+  modalTasksScratch = [];
+  document.getElementById('pmId').value = '';
+  document.getElementById('pmName').value = '';
+  document.getElementById('pmStatus').value = 'dev';
+  document.getElementById('pmDesc').value = '';
+  document.getElementById('pmProgress').value = 0;
+  onProgressSlider(0);
+  document.getElementById('projectModalTitle').textContent = '📁 פרויקט חדש';
+  document.getElementById('projectModalSub').textContent = 'יצירה ושמירה · אפשר גם לבקש מ-Hermes בצ׳אט';
+  document.getElementById('pmDeleteBtn').style.display = 'none';
+  renderModalTasks();
+  document.getElementById('projectModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('pmName').focus(), 50);
+}
+
+
 
 // ── CONFIG ──
 // NOTE: Leo is intentionally NOT independently configurable from this UI.
@@ -1066,12 +1688,7 @@ function showTab(name, el) {
   if (name === 'files') loadFiles();
 }
 
-// ── CONTEXT ──
-function setContext(name) {
-  currentContext = name;
-  document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
-}
-
+// ── CONTEXT (setContext defined with projects store) ──
 function setCtx(el, name) {
   document.querySelectorAll('.ctx-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
@@ -1130,6 +1747,7 @@ function saveSettings() {
   closeSettings();
   checkHealth();
   addSystemMsg('✅ הגדרות נשמרו. מחבר מחדש...');
+  fetchProjectsFromHermes();
 }
 
 // ── CHAT ──
@@ -1406,10 +2024,27 @@ async function loadFiles() {
   }
 }
 
-// ── PLACEHOLDERS ──
-function addProject() { addSystemMsg('💬 אמור ל-Hermes: "צור פרויקט חדש בשם [שם]"'); }
+// ── AGENTS / TASKS (chat path unchanged) ──
 function addAgent() { addSystemMsg('💬 פנה אל Hermes לבניית סוכן חדש'); }
-function addTask() { document.getElementById('chatInput').focus(); document.getElementById('chatInput').placeholder = 'תאר את המשימה החדשה...'; }
+function addTask() {
+  // Prefer adding into current project when a specific context is selected
+  if (currentContext && currentContext !== 'כל הפרויקטים') {
+    const p = findProject(currentContext);
+    if (p) {
+      openProject(p.id);
+      addModalTask();
+      return;
+    }
+  }
+  document.getElementById('chatInput').focus();
+  document.getElementById('chatInput').placeholder = 'תאר את המשימה החדשה...';
+}
+
+// ── INIT PROJECTS ──
+PROJECTS_STORE = loadProjectsFromLocal();
+persistProjectsLocal();
+renderAllProjectUI();
+fetchProjectsFromHermes();
 </script>
 </body>
 </html>
