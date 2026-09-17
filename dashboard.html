@@ -1086,6 +1086,22 @@ body {
 .modal-btn { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-family: 'Space Grotesk', sans-serif; transition: all 0.15s; }
 .modal-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
 .modal-btn:hover { opacity: 0.85; }
+.otp-section {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 4px;
+}
+.otp-status {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  padding: 8px 4px 0;
+  line-height: 1.4;
+}
+.otp-status.ok { color: var(--green, #34d399); }
+.otp-status.warn { color: var(--accent); }
+.otp-status.err { color: var(--danger, #ff4d6d); }
 
 .modal.project-modal {
   width: min(720px, 94vw);
@@ -1261,9 +1277,27 @@ body {
       <label>Browser-Agent URL (אופציונלי — health)</label>
       <input id="browserUrl" placeholder="https://browser-xxx.up.railway.app">
     </div>
+    <div class="otp-section" id="otpSection">
+      <div class="modal-sub" style="margin:12px 0 8px;color:var(--accent)">אימות טלגרם (OTP)</div>
+      <div class="modal-field" style="margin-bottom:8px">
+        <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px">
+          שמירת URL + Backoffice Token לבדה <strong>לא</strong> פותחת את ה-APIs המוגנים.
+          יש לשלוח קוד לטלגרם ולאמת אותו. ה-session תקף 12 שעות.
+        </div>
+        <button type="button" class="modal-btn primary" style="width:100%;margin-bottom:10px" onclick="requestOtp()">שלח קוד לטלגרם</button>
+      </div>
+      <div class="modal-field">
+        <label>קוד OTP (6 ספרות)</label>
+        <input id="otpCode" type="text" inputmode="numeric" maxlength="8" placeholder="123456" autocomplete="one-time-code">
+      </div>
+      <div class="modal-field" style="margin-top:4px">
+        <button type="button" class="modal-btn primary" style="width:100%" onclick="verifyOtp()">אמת קוד</button>
+      </div>
+      <div id="otpStatus" class="otp-status">לא מאומת</div>
+    </div>
     <div class="modal-btns">
       <button class="modal-btn" onclick="closeSettings()">ביטול</button>
-      <button class="modal-btn primary" onclick="saveSettings()">שמור וחבר</button>
+      <button class="modal-btn primary" onclick="saveSettings()">שמור URL ו-Token</button>
     </div>
   </div>
 </div>
@@ -1728,10 +1762,12 @@ function renderAgentChips() {
 async function fetchAgentsFromHermes() {
   const cfg = getConfig();
   if (!cfg.hermesUrl) return;
+  if (!cfg.sessionToken) return; // silent — no OTP spam on optional agents sync
   try {
     const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/agents', {
       headers: { 'Authorization': `Bearer ${cfg.token}` }
     });
+    if (res.status === 401) { await handleAuthResponse(res); return; }
     if (res.status === 404) return;
     if (!res.ok) return;
     const data = await res.json();
@@ -2167,10 +2203,12 @@ function mergeServerProjects(serverList) {
 async function fetchProjectsFromHermes() {
   const cfg = getConfig();
   if (!cfg.hermesUrl) return;
+  if (!requireSessionForApi('סנכרון פרויקטים')) return;
   try {
     const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects', {
       headers: { 'Authorization': `Bearer ${cfg.token}`, 'Accept': 'application/json' }
     });
+    if (await handleAuthResponse(res)) return;
     if (!res.ok) {
       addSystemMsg('ℹ️ טעינת פרויקטים מהשרת נכשלה (' + res.status + ') — נשאר מקומי');
       return;
@@ -2551,6 +2589,12 @@ async function saveProject() {
     tasks: (p.tasks || []).map(t => ({ id: t.id, text: t.text, done: !!t.done }))
   };
 
+  if (!requireSessionForApi('שמירת פרויקט בשרת')) {
+    addSystemMsg('💾 נשמר מקומית — סנכרון לשרת דורש OTP');
+    closeProjectModal();
+    return;
+  }
+
   try {
     const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects/update', {
       method: 'POST',
@@ -2560,6 +2604,11 @@ async function saveProject() {
       },
       body: JSON.stringify(payload)
     });
+    if (await handleAuthResponse(res)) {
+      addSystemMsg('💾 נשמר מקומית — נדרש OTP מחדש לסנכרון');
+      closeProjectModal();
+      return;
+    }
     if (res.ok) {
       addSystemMsg('✅ הפרויקט נשמר מקומית ובשרת');
     } else {
@@ -2591,6 +2640,10 @@ async function deleteProject() {
     addSystemMsg('🗑️ הפרויקט נמחק מקומית');
     return;
   }
+  if (!isSessionValid()) {
+    addSystemMsg('🗑️ נמחק מקומית — סנכרון מחיקה לשרת דורש OTP');
+    return;
+  }
   try {
     const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/projects/update', {
       method: 'POST',
@@ -2600,6 +2653,10 @@ async function deleteProject() {
       },
       body: JSON.stringify({ action: 'delete', project: { id: p.id, name: p.name } })
     });
+    if (await handleAuthResponse(res)) {
+      addSystemMsg('🗑️ נמחק מקומית — נדרש OTP מחדש לסנכרון');
+      return;
+    }
     if (res.ok) addSystemMsg('🗑️ הפרויקט נמחק מקומית ובשרת');
     else addSystemMsg('🗑️ נמחק מקומית · השרת החזיר ' + res.status);
   } catch (e) {
@@ -2873,13 +2930,212 @@ document.addEventListener('mouseup', () => {
 // This UI only ever talks to Hermes; Leo's URL below is used ONLY for the
 // passive health-check dot, never for sending tasks.
 function getConfig() {
+  const hermesUrl = localStorage.getItem('hermes_url') || '';
+  const bootstrapToken = localStorage.getItem('hermes_token') || '';
+  const sessionToken = localStorage.getItem('hermes_session_token') || '';
+  const sessionId = localStorage.getItem('hermes_session_id') || '';
+  const sessionExpiresAt = Number(localStorage.getItem('hermes_session_expires_at') || '0') || 0;
+  // `token` is used for protected API calls — session only (never bootstrap).
   return {
-    hermesUrl: localStorage.getItem('hermes_url') || '',
-    token: localStorage.getItem('hermes_token') || 'hermes-backoffice-2026',
+    hermesUrl,
+    bootstrapToken,
+    sessionToken,
+    sessionId,
+    sessionExpiresAt,
+    token: sessionToken,
     leoUrl: localStorage.getItem('leo_url') || 'https://liron-agent-production.up.railway.app',
     yamUrl: localStorage.getItem('yam_url') || '',
     browserUrl: localStorage.getItem('browser_url') || ''
   };
+}
+
+function isSessionValid() {
+  const cfg = getConfig();
+  if (!cfg.sessionToken) return false;
+  if (cfg.sessionExpiresAt && Date.now() > cfg.sessionExpiresAt) {
+    clearSessionAuth('תוקף ה-session פג — נדרש אימות OTP מחדש');
+    return false;
+  }
+  return true;
+}
+
+function clearSessionAuth(reasonMsg) {
+  localStorage.removeItem('hermes_session_token');
+  localStorage.removeItem('hermes_session_expires_at');
+  // keep session_id optional for re-verify of same request if still valid
+  updateOtpStatusUI();
+  if (reasonMsg) {
+    addSystemMsg('🔐 ' + reasonMsg);
+    openSettings();
+  }
+}
+
+function updateOtpStatusUI() {
+  const el = document.getElementById('otpStatus');
+  if (!el) return;
+  const cfg = getConfig();
+  el.className = 'otp-status';
+  if (cfg.sessionToken && (!cfg.sessionExpiresAt || Date.now() < cfg.sessionExpiresAt)) {
+    const until = cfg.sessionExpiresAt
+      ? new Date(cfg.sessionExpiresAt).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' })
+      : '';
+    el.classList.add('ok');
+    el.textContent = until
+      ? ('מאומת עד ' + until)
+      : 'מאומת';
+  } else if (cfg.sessionId) {
+    el.classList.add('warn');
+    el.textContent = 'קוד נשלח — הזן את הקוד מהטלגרם';
+  } else {
+    el.textContent = 'לא מאומת — יש לשלוח קוד OTP לטלגרם';
+  }
+}
+
+/** Gate protected Hermes APIs. Returns false if session missing (opens settings). */
+function requireSessionForApi(actionLabel) {
+  if (isSessionValid()) return true;
+  const label = actionLabel || 'הפעולה';
+  addSystemMsg('🔐 ' + label + ' דורשת אימות OTP. שלח קוד לטלגרם ואמת בהגדרות.');
+  openSettings();
+  return false;
+}
+
+async function handleAuthResponse(res) {
+  if (res && res.status === 401) {
+    const cfg = getConfig();
+    if (cfg.sessionToken) {
+      clearSessionAuth('ה-session נדחה (401) — יש לאמת OTP מחדש');
+    }
+    return true;
+  }
+  return false;
+}
+
+async function requestOtp() {
+  // Persist URL + bootstrap from form fields first
+  const urlEl = document.getElementById('hermesUrl');
+  const tokEl = document.getElementById('backofficeToken');
+  if (urlEl) localStorage.setItem('hermes_url', urlEl.value.trim());
+  if (tokEl) localStorage.setItem('hermes_token', tokEl.value.trim());
+
+  const cfg = getConfig();
+  const status = document.getElementById('otpStatus');
+  if (!cfg.hermesUrl) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'חסר Hermes URL'; }
+    addSystemMsg('⚠️ הזן קודם Hermes URL');
+    return;
+  }
+  if (!cfg.bootstrapToken) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'חסר Backoffice Token'; }
+    addSystemMsg('⚠️ הזן Backoffice Token (bootstrap)');
+    return;
+  }
+  if (status) { status.className = 'otp-status warn'; status.textContent = 'שולח קוד...'; }
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/auth/request-otp', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + cfg.bootstrapToken }
+    });
+    if (res.status === 401) {
+      if (status) { status.className = 'otp-status err'; status.textContent = 'Backoffice Token שגוי (401)'; }
+      addSystemMsg('❌ Backoffice Token שגוי — לא ניתן לשלוח OTP');
+      return;
+    }
+    if (!res.ok) {
+      if (status) { status.className = 'otp-status err'; status.textContent = 'שגיאה בשליחת קוד (' + res.status + ')'; }
+      addSystemMsg('❌ שליחת OTP נכשלה (' + res.status + ')');
+      return;
+    }
+    const data = await res.json();
+    const sid = data && data.session_id;
+    if (!sid) {
+      if (status) { status.className = 'otp-status err'; status.textContent = 'תשובה לא תקינה מהשרת'; }
+      return;
+    }
+    localStorage.setItem('hermes_session_id', sid);
+    localStorage.removeItem('hermes_session_token');
+    localStorage.removeItem('hermes_session_expires_at');
+    if (status) {
+      status.className = 'otp-status warn';
+      status.textContent = 'קוד נשלח לטלגרם (תוקף 5 דקות)';
+    }
+    addSystemMsg('✅ קוד נשלח לטלגרם (תוקף 5 דקות)');
+    const codeEl = document.getElementById('otpCode');
+    if (codeEl) { codeEl.value = ''; codeEl.focus(); }
+  } catch (e) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'שגיאת רשת בשליחת OTP'; }
+    addSystemMsg('⚠️ שגיאת רשת בבקשת OTP');
+  }
+}
+
+async function verifyOtp() {
+  const urlEl = document.getElementById('hermesUrl');
+  if (urlEl) localStorage.setItem('hermes_url', urlEl.value.trim());
+
+  const cfg = getConfig();
+  const status = document.getElementById('otpStatus');
+  const codeEl = document.getElementById('otpCode');
+  const code = (codeEl && codeEl.value ? codeEl.value.trim() : '');
+  const sessionId = cfg.sessionId || localStorage.getItem('hermes_session_id') || '';
+
+  if (!cfg.hermesUrl) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'חסר Hermes URL'; }
+    return;
+  }
+  if (!sessionId) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'אין session — שלח קוד קודם'; }
+    addSystemMsg('⚠️ יש לשלוח קוד לטלגרם לפני האימות');
+    return;
+  }
+  if (!code) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'הזן את קוד ה-OTP'; }
+    return;
+  }
+
+  if (status) { status.className = 'otp-status warn'; status.textContent = 'מאמת...'; }
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, code: code })
+    });
+    if (!res.ok) {
+      let errText = '';
+      try {
+        const errData = await res.json();
+        errText = (errData && (errData.error || errData.message || errData.detail)) || '';
+      } catch (_) {}
+      const lower = String(errText).toLowerCase();
+      let heb = 'אימות נכשל (' + res.status + ')';
+      if (res.status === 401) {
+        if (lower.includes('expired') || lower.includes('פג')) heb = 'הקוד פג תוקף — שלח קוד חדש';
+        else if (lower.includes('incorrect') || lower.includes('invalid code') || lower.includes('wrong')) heb = 'קוד שגוי';
+        else if (lower.includes('session')) heb = 'session לא תקין — שלח קוד מחדש';
+        else heb = 'אימות נכשל — קוד שגוי / פג תוקף / session לא תקין';
+      }
+      if (status) { status.className = 'otp-status err'; status.textContent = heb; }
+      addSystemMsg('❌ ' + heb);
+      return;
+    }
+    const data = await res.json();
+    const st = data && data.session_token;
+    if (!st) {
+      if (status) { status.className = 'otp-status err'; status.textContent = 'תשובה ללא session_token'; }
+      return;
+    }
+    const expires = Date.now() + 12 * 60 * 60 * 1000;
+    localStorage.setItem('hermes_session_token', st);
+    localStorage.setItem('hermes_session_expires_at', String(expires));
+    updateOtpStatusUI();
+    addSystemMsg('✅ אימות OTP הצליח — APIs מוגנים פעילים (12 שעות)');
+    closeSettings();
+    fetchProjectsFromHermes();
+    checkHealth();
+    fetchAgentsFromHermes();
+  } catch (e) {
+    if (status) { status.className = 'otp-status err'; status.textContent = 'שגיאת רשת באימות'; }
+    addSystemMsg('⚠️ שגיאת רשת באימות OTP');
+  }
 }
 
 // ── CLOCK ──
@@ -2972,11 +3228,14 @@ function toggleTask(el) {
 function openSettings() {
   const cfg = getConfig();
   document.getElementById('hermesUrl').value = cfg.hermesUrl;
-  document.getElementById('backofficeToken').value = cfg.token;
+  document.getElementById('backofficeToken').value = cfg.bootstrapToken || '';
   const yamEl = document.getElementById('yamUrl');
   const brEl = document.getElementById('browserUrl');
   if (yamEl) yamEl.value = cfg.yamUrl || '';
   if (brEl) brEl.value = cfg.browserUrl || '';
+  const codeEl = document.getElementById('otpCode');
+  if (codeEl) codeEl.value = '';
+  updateOtpStatusUI();
   document.getElementById('settingsModal').style.display = 'flex';
   closeStartMenu();
 }
@@ -2992,11 +3251,17 @@ function saveSettings() {
   const brEl = document.getElementById('browserUrl');
   if (yamEl) localStorage.setItem('yam_url', yamEl.value.trim());
   if (brEl) localStorage.setItem('browser_url', brEl.value.trim());
-  closeSettings();
   checkHealth();
-  addSystemMsg('✅ הגדרות נשמרו. מחבר מחדש...');
-  fetchProjectsFromHermes();
-  fetchAgentsFromHermes();
+  updateOtpStatusUI();
+  if (isSessionValid()) {
+    closeSettings();
+    addSystemMsg('✅ הגדרות נשמרו. session פעיל — מסנכרן...');
+    fetchProjectsFromHermes();
+    fetchAgentsFromHermes();
+  } else {
+    addSystemMsg('✅ URL ו-Backoffice Token נשמרו. APIs מוגנים ייפתחו רק אחרי אימות OTP.');
+    // keep modal open so user can request/verify OTP
+  }
 }
 
 // ── CHAT ──
@@ -3025,12 +3290,24 @@ async function sendMessage() {
     if (!cfg.hermesUrl) {
       throw new Error('no-hermes-url');
     }
+    if (!requireSessionForApi('שליחת הודעה')) {
+      removeTyping(typingId);
+      btn.disabled = false;
+      input.focus();
+      return;
+    }
 
     const res = await fetch(cfg.hermesUrl + '/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.token}` },
       body: JSON.stringify({ message: msg, user_id: 'backoffice', context: currentContext })
     });
+    if (await handleAuthResponse(res)) {
+      removeTyping(typingId);
+      btn.disabled = false;
+      input.focus();
+      return;
+    }
     const data = await res.json();
     const reply = data.response || 'שגיאה בתשובה';
 
@@ -3043,7 +3320,7 @@ async function sendMessage() {
 
   } catch (e) {
     removeTyping(typingId);
-    addSystemMsg('⚠️ שגיאת חיבור ל-Hermes. בדוק הגדרות (⚙) — ודא שכתובת ה-URL וה-Token נכונים.');
+    addSystemMsg('⚠️ שגיאת חיבור ל-Hermes. בדוק הגדרות (⚙) — URL + אימות OTP.');
   }
 
   btn.disabled = false;
@@ -3253,6 +3530,10 @@ async function handleFileSelected(event) {
     openWindow('chat');
     return;
   }
+  if (!requireSessionForApi('העלאת קובץ')) {
+    openWindow('chat');
+    return;
+  }
 
   openWindow('chat');
   addSystemMsg(`📎 מעלה ${file.name}...`);
@@ -3263,6 +3544,7 @@ async function handleFileSelected(event) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.token}` },
       body: JSON.stringify({ filename: file.name, mimetype: file.type || 'application/octet-stream', content_base64 })
     });
+    if (await handleAuthResponse(res)) return;
     const data = await res.json();
     if (data.link) {
       addMsg(`📎 <a href="${data.link}" target="_blank" style="color:var(--cyan)">${file.name}</a> הועלה בהצלחה`, 'user');
@@ -3283,11 +3565,19 @@ async function loadFiles() {
     list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">הגדר קודם את כתובת ה-URL של Hermes (⚙)</div>';
     return;
   }
+  if (!requireSessionForApi('טעינת קבצים')) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">נדרש אימות OTP בהגדרות (⚙)</div>';
+    return;
+  }
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">טוען...</div>';
   try {
     const res = await fetch(cfg.hermesUrl + '/files', {
       headers: { 'Authorization': `Bearer ${cfg.token}` }
     });
+    if (await handleAuthResponse(res)) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">נדרש אימות OTP מחדש</div>';
+      return;
+    }
     const data = await res.json();
     const files = data.files || [];
     if (files.length === 0) {
@@ -3399,8 +3689,11 @@ persistProjectsLocal();
 renderAllProjectUI();
 renderNotesUI();
 renderStickyNotes();
-fetchProjectsFromHermes();
-fetchAgentsFromHermes();
+if (isSessionValid()) {
+  fetchProjectsFromHermes();
+  fetchAgentsFromHermes();
+}
+updateOtpStatusUI();
 
 const hadLayout = restoreWinLayout();
 if (!hadLayout) {
