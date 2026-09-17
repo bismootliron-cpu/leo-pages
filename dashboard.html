@@ -1253,9 +1253,55 @@ body {
       <label>Backoffice Token</label>
       <input id="backofficeToken" type="password" placeholder="hermes-backoffice-2026">
     </div>
+    <div class="modal-field">
+      <label>Yam URL (אופציונלי — health)</label>
+      <input id="yamUrl" placeholder="https://yam-xxx.up.railway.app">
+    </div>
+    <div class="modal-field">
+      <label>Browser-Agent URL (אופציונלי — health)</label>
+      <input id="browserUrl" placeholder="https://browser-xxx.up.railway.app">
+    </div>
     <div class="modal-btns">
       <button class="modal-btn" onclick="closeSettings()">ביטול</button>
       <button class="modal-btn primary" onclick="saveSettings()">שמור וחבר</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD AGENT MODAL -->
+<div class="modal-overlay" id="addAgentModal" style="display:none" onclick="if(event.target===this)closeAddAgentModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div>
+      <div class="modal-title">➕ הוסף סוכן</div>
+      <div class="modal-sub">יופיע בצ׳יפים וברשת · שיחה עדיין דרך Hermes</div>
+    </div>
+    <div class="modal-row-2">
+      <div class="modal-field">
+        <label>מזהה (slug)</label>
+        <input id="aaId" placeholder="my-agent" autocomplete="off">
+      </div>
+      <div class="modal-field">
+        <label>שם תצוגה</label>
+        <input id="aaName" placeholder="שם הסוכן">
+      </div>
+    </div>
+    <div class="modal-row-2">
+      <div class="modal-field">
+        <label>תפקיד</label>
+        <input id="aaRole" placeholder="תפקיד בעברית">
+      </div>
+      <div class="modal-field">
+        <label>אייקון (emoji)</label>
+        <input id="aaIcon" placeholder="🤖" maxlength="4">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>צבע</label>
+      <input id="aaColor" type="color" value="#a78bfa" style="height:42px;padding:4px;cursor:pointer">
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeAddAgentModal()">ביטול</button>
+      <button class="modal-btn primary" onclick="saveNewAgent()">שמור סוכן</button>
     </div>
   </div>
 </div>
@@ -1372,7 +1418,7 @@ body {
         </div>
         <div class="metric-card">
           <div class="mc-label">סוכנים</div>
-          <div class="mc-value cyan">2</div>
+          <div class="mc-value cyan" id="metricAgentsCount">4</div>
         </div>
         <div class="metric-card">
           <div class="mc-label">משימות פתוחות</div>
@@ -1413,9 +1459,8 @@ body {
               <div class="chat-agent-status" id="chatAgentStatus">● מוח ראשי</div>
             </div>
           </div>
-          <div class="agent-selector">
-            <div class="agent-chip active" onclick="switchAgent('hermes', this)">Hermes</div>
-            <div class="agent-chip" onclick="switchAgent('leo', this)">Leo (תצוגה בלבד)</div>
+          <div class="agent-selector" id="agentSelector">
+            <!-- filled by renderAgentChips() -->
           </div>
         </div>
         <div class="context-bar" id="contextBar"></div>
@@ -1573,6 +1618,143 @@ let startTime = Date.now();
 let zCounter = 30;
 let dragState = null;
 let networkAnimId = null;
+
+// ── AGENTS STORE ──
+// UI talks only to Hermes for chat. Leo / Yam / Browser chips are VIEW FILTERS —
+// messages still go to Hermes. talkDirect:true only for Hermes.
+const AGENTS_LS_KEY = 'hermes_agents_v1';
+let AGENTS_STORE = [];
+
+function defaultAgentsSeed() {
+  return [
+    {
+      id: 'hermes',
+      name: 'Hermes',
+      role: 'מוח ראשי',
+      icon: '🧠',
+      color: '#6c63ff',
+      talkDirect: true,
+      healthPath: '/health',
+      urlKey: 'hermes_url',
+      hint: 'Enter לשליחה · Shift+Enter לשורה חדשה · 📎 לצירוף קובץ'
+    },
+    {
+      id: 'leo',
+      name: 'Leo',
+      role: 'תפעול',
+      icon: '⚙️',
+      color: '#00e5cc',
+      talkDirect: false,
+      healthPath: '/health',
+      urlKey: 'leo_url',
+      hint: 'הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-Leo'
+    },
+    {
+      id: 'yam',
+      name: 'ים',
+      role: 'מדיה שיווקית',
+      icon: '🌊',
+      color: '#ffb020',
+      talkDirect: false,
+      healthPath: '/health',
+      urlKey: 'yam_url',
+      url: '',
+      hint: 'הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-ים'
+    },
+    {
+      id: 'browser',
+      name: 'Browser-Agent',
+      role: 'דפדפן',
+      icon: '🌐',
+      color: '#ff4d6d',
+      talkDirect: false,
+      healthPath: '/health',
+      urlKey: 'browser_url',
+      url: '',
+      hint: 'הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-Browser'
+    }
+  ];
+}
+
+function persistAgents() {
+  try { localStorage.setItem(AGENTS_LS_KEY, JSON.stringify(AGENTS_STORE)); } catch (e) {}
+}
+
+function loadAgents() {
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem(AGENTS_LS_KEY) || 'null'); } catch (e) { stored = null; }
+  if (!Array.isArray(stored) || stored.length === 0) {
+    AGENTS_STORE = defaultAgentsSeed();
+    persistAgents();
+  } else {
+    // Merge defaults so new seed agents appear even if older store lacked them
+    const byId = {};
+    stored.forEach(a => { if (a && a.id) byId[a.id] = a; });
+    const seed = defaultAgentsSeed();
+    seed.forEach(s => {
+      if (!byId[s.id]) byId[s.id] = s;
+      else byId[s.id] = Object.assign({}, s, byId[s.id], { id: s.id });
+    });
+    // Keep custom agents (not in seed) after seed order
+    const seedIds = new Set(seed.map(s => s.id));
+    const extras = stored.filter(a => a && a.id && !seedIds.has(a.id));
+    AGENTS_STORE = seed.map(s => byId[s.id]).concat(extras);
+    persistAgents();
+  }
+  updateAgentsMetric();
+}
+
+function findAgent(id) {
+  return AGENTS_STORE.find(a => a.id === id) || null;
+}
+
+function updateAgentsMetric() {
+  const el = document.getElementById('metricAgentsCount');
+  if (el) el.textContent = String(AGENTS_STORE.length);
+}
+
+function renderAgentChips() {
+  const box = document.getElementById('agentSelector') || document.querySelector('.agent-selector');
+  if (!box) return;
+  box.innerHTML = AGENTS_STORE.map(a => {
+    const active = a.id === currentAgent ? ' active' : '';
+    const label = a.talkDirect ? a.name : `${a.name}`;
+    const title = a.talkDirect ? '' : ' title="תצוגה בלבד — הודעות עוברות ל-Hermes"';
+    return `<div class="agent-chip${active}" data-agent="${a.id}" onclick="switchAgent('${a.id}', this)"${title}>${label}</div>`;
+  }).join('') + `<div class="agent-chip" onclick="addAgent()" title="הוסף סוכן" style="border-style:dashed">＋</div>`;
+  updateAgentsMetric();
+}
+
+async function fetchAgentsFromHermes() {
+  const cfg = getConfig();
+  if (!cfg.hermesUrl) return;
+  try {
+    const res = await fetch(cfg.hermesUrl.replace(/\/$/, '') + '/agents', {
+      headers: { 'Authorization': `Bearer ${cfg.token}` }
+    });
+    if (res.status === 404) return;
+    if (!res.ok) return;
+    const data = await res.json();
+    const arr = Array.isArray(data) ? data : (Array.isArray(data.agents) ? data.agents : null);
+    if (!arr) return;
+    const byId = {};
+    AGENTS_STORE.forEach(a => { byId[a.id] = a; });
+    arr.forEach(s => {
+      if (!s || !s.id) return;
+      const prev = byId[s.id] || {};
+      byId[s.id] = Object.assign({}, prev, s, { id: s.id }); // server wins
+    });
+    // Preserve order: existing first, then new from server
+    const order = [];
+    const seen = new Set();
+    AGENTS_STORE.forEach(a => { if (byId[a.id]) { order.push(byId[a.id]); seen.add(a.id); } });
+    arr.forEach(s => { if (s && s.id && !seen.has(s.id)) { order.push(byId[s.id]); seen.add(s.id); } });
+    AGENTS_STORE = order;
+    persistAgents();
+    renderAgentChips();
+    if (openWins.has('network')) drawNetwork();
+  } catch (e) { /* ignore — endpoint may not exist */ }
+}
 
 const WIN_META = {
   projects: { id: 'win-projects', title: 'פרויקטים' },
@@ -2694,7 +2876,9 @@ function getConfig() {
   return {
     hermesUrl: localStorage.getItem('hermes_url') || '',
     token: localStorage.getItem('hermes_token') || 'hermes-backoffice-2026',
-    leoUrl: localStorage.getItem('leo_url') || 'https://liron-agent-production.up.railway.app'
+    leoUrl: localStorage.getItem('leo_url') || 'https://liron-agent-production.up.railway.app',
+    yamUrl: localStorage.getItem('yam_url') || '',
+    browserUrl: localStorage.getItem('browser_url') || ''
   };
 }
 
@@ -2743,28 +2927,39 @@ function setCtx(el, name) {
 }
 
 // ── AGENT SWITCH ──
-// "Leo" is a VIEW filter only — every message still goes to Hermes.
-// Leo never receives instructions directly from this UI; only Hermes
-// decides (via [AGENT TASK]) whether and what to delegate to him.
-function switchAgent(agent, el) {
-  currentAgent = agent;
+// Non-Hermes chips are VIEW FILTERS only — every message still goes to Hermes.
+// Leo / Yam / Browser never receive instructions directly from this UI; only
+// Hermes decides (via [AGENT TASK]) whether and what to delegate.
+function switchAgent(agentId, el) {
+  const agent = findAgent(agentId) || findAgent('hermes');
+  if (!agent) return;
+  currentAgent = agent.id;
+  document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
   if (el) {
-    document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
+  } else {
+    const chip = document.querySelector(`.agent-chip[data-agent="${agent.id}"]`);
+    if (chip) chip.classList.add('active');
   }
   const icon = document.getElementById('chatAgentIcon');
   const name = document.getElementById('chatAgentName');
   const status = document.getElementById('chatAgentStatus');
   const hint = document.getElementById('inputHint');
-  if (agent === 'hermes') {
-    icon.textContent = '🧠'; name.textContent = 'Hermes'; status.textContent = '● מוח ראשי';
-    status.style.color = 'var(--accent)';
-    hint.textContent = 'Enter לשליחה · Shift+Enter לשורה חדשה · 📎 לצירוף קובץ';
-  } else {
-    icon.textContent = '⚙️'; name.textContent = 'Leo'; status.textContent = '● תפעול (רק דרך Hermes)';
-    status.style.color = 'var(--cyan)';
-    hint.textContent = 'הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-Leo';
-    addSystemMsg('ℹ️ אין שיחה ישירה עם Leo. כל הודעה עוברת דרך Hermes, שמחליט אם להאציל ל-Leo.');
+  if (icon) icon.textContent = agent.icon || '🤖';
+  if (name) name.textContent = agent.name || agent.id;
+  if (status) {
+    status.textContent = agent.talkDirect
+      ? `● ${agent.role || ''}`
+      : `● ${agent.role || ''} (רק דרך Hermes)`;
+    status.style.color = agent.color || 'var(--accent)';
+  }
+  if (hint) {
+    hint.textContent = agent.hint || (agent.talkDirect
+      ? 'Enter לשליחה · Shift+Enter לשורה חדשה · 📎 לצירוף קובץ'
+      : `הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-${agent.name}`);
+  }
+  if (!agent.talkDirect) {
+    addSystemMsg(`ℹ️ אין שיחה ישירה עם ${agent.name}. כל הודעה עוברת דרך Hermes, שמחליט אם להאציל.`);
   }
 }
 
@@ -2778,6 +2973,10 @@ function openSettings() {
   const cfg = getConfig();
   document.getElementById('hermesUrl').value = cfg.hermesUrl;
   document.getElementById('backofficeToken').value = cfg.token;
+  const yamEl = document.getElementById('yamUrl');
+  const brEl = document.getElementById('browserUrl');
+  if (yamEl) yamEl.value = cfg.yamUrl || '';
+  if (brEl) brEl.value = cfg.browserUrl || '';
   document.getElementById('settingsModal').style.display = 'flex';
   closeStartMenu();
 }
@@ -2789,10 +2988,15 @@ function closeSettings() {
 function saveSettings() {
   localStorage.setItem('hermes_url', document.getElementById('hermesUrl').value.trim());
   localStorage.setItem('hermes_token', document.getElementById('backofficeToken').value.trim());
+  const yamEl = document.getElementById('yamUrl');
+  const brEl = document.getElementById('browserUrl');
+  if (yamEl) localStorage.setItem('yam_url', yamEl.value.trim());
+  if (brEl) localStorage.setItem('browser_url', brEl.value.trim());
   closeSettings();
   checkHealth();
   addSystemMsg('✅ הגדרות נשמרו. מחבר מחדש...');
   fetchProjectsFromHermes();
+  fetchAgentsFromHermes();
 }
 
 // ── CHAT ──
@@ -2904,12 +3108,33 @@ function drawNetwork() {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
 
-  const agents = [
-    { name: 'Hermes', role: 'מוח ראשי', color: '#6c63ff', x: cx, y: cy, r: 40, icon: '🧠' },
-    { name: 'Leo', role: 'תפעול', color: '#00e5cc', x: cx - 200, y: cy - 80, r: 30, icon: '⚙️' },
-    { name: '+ סוכן', role: 'עתידי', color: '#5a5a7a', x: cx + 200, y: cy - 80, r: 25, icon: '+' },
-    { name: '+ סוכן', role: 'עתידי', color: '#5a5a7a', x: cx + 180, y: cy + 120, r: 25, icon: '+' },
-  ];
+  // Build nodes from AGENTS_STORE — Hermes center, others around. No fake placeholders.
+  const store = (AGENTS_STORE && AGENTS_STORE.length) ? AGENTS_STORE : defaultAgentsSeed();
+  const hermes = store.find(a => a.id === 'hermes') || store[0];
+  const others = store.filter(a => a.id !== (hermes && hermes.id));
+  const agents = [];
+  if (hermes) {
+    agents.push({
+      id: hermes.id, name: hermes.name, role: hermes.role || '',
+      color: hermes.color || '#6c63ff', x: cx, y: cy, r: 40, icon: hermes.icon || '🧠'
+    });
+  }
+  others.forEach((a, i) => {
+    const n = Math.max(others.length, 1);
+    const ang = (-Math.PI / 2) + (i * (2 * Math.PI / n));
+    const radius = Math.min(w, h) * 0.32;
+    agents.push({
+      id: a.id, name: a.name, role: a.role || '',
+      color: a.color || '#00e5cc',
+      x: cx + Math.cos(ang) * radius,
+      y: cy + Math.sin(ang) * (radius * 0.75),
+      r: 28, icon: a.icon || '🤖'
+    });
+  });
+  // If somehow only hermes / empty extras — do not invent '+ סוכן' nodes
+
+  const hub = agents[0] || { x: cx, y: cy };
+  const leoNode = agents.find(a => a.id === 'leo') || hub;
 
   const projects = PROJECTS_STORE.slice(0, 4).map((p, i) => {
     const angles = [-2.2, -1.2, 0.4, 1.8];
@@ -2929,15 +3154,15 @@ function drawNetwork() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     frame++;
 
+    // Link every real non-Hermes agent to Hermes
     agents.slice(1).forEach(agent => {
-      if (agent.color === '#5a5a7a') return;
       ctx.save();
       ctx.setLineDash([4, 6]);
       ctx.lineDashOffset = -frame * 0.3;
       ctx.strokeStyle = agent.color + '60';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(agents[0].x, agents[0].y);
+      ctx.moveTo(hub.x, hub.y);
       ctx.lineTo(agent.x, agent.y);
       ctx.stroke();
       ctx.restore();
@@ -2949,7 +3174,7 @@ function drawNetwork() {
       ctx.strokeStyle = p.color + '40';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(agents[1].x, agents[1].y);
+      ctx.moveTo(leoNode.x, leoNode.y);
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
       ctx.restore();
@@ -2973,25 +3198,23 @@ function drawNetwork() {
     agents.forEach(agent => {
       const pulse = Math.sin(frame * 0.05) * 4;
 
-      if (agent.color !== '#5a5a7a') {
-        ctx.beginPath();
-        ctx.arc(agent.x, agent.y, agent.r + 8 + pulse, 0, Math.PI * 2);
-        ctx.fillStyle = agent.color + '15';
-        ctx.fill();
-      }
+      ctx.beginPath();
+      ctx.arc(agent.x, agent.y, agent.r + 8 + pulse, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color + '15';
+      ctx.fill();
 
       ctx.beginPath();
       ctx.arc(agent.x, agent.y, agent.r, 0, Math.PI * 2);
-      ctx.fillStyle = agent.color === '#5a5a7a' ? '#1a1a2e' : agent.color + '25';
+      ctx.fillStyle = agent.color + '25';
       ctx.fill();
       ctx.strokeStyle = agent.color;
-      ctx.lineWidth = agent.color === '#5a5a7a' ? 1 : 2;
+      ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.font = `${agent.r * 0.8}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = agent.color === '#5a5a7a' ? '#5a5a7a' : 'white';
+      ctx.fillStyle = 'white';
       ctx.fillText(agent.icon, agent.x, agent.y);
 
       ctx.font = '13px Space Grotesk';
@@ -3084,7 +3307,69 @@ async function loadFiles() {
   }
 }
 
-function addAgent() { addSystemMsg('💬 פנה אל Hermes לבניית סוכן חדש'); openWindow('chat'); }
+function addAgent() {
+  const idEl = document.getElementById('aaId');
+  const nameEl = document.getElementById('aaName');
+  const roleEl = document.getElementById('aaRole');
+  const iconEl = document.getElementById('aaIcon');
+  const colorEl = document.getElementById('aaColor');
+  if (idEl) idEl.value = '';
+  if (nameEl) nameEl.value = '';
+  if (roleEl) roleEl.value = '';
+  if (iconEl) iconEl.value = '🤖';
+  if (colorEl) colorEl.value = '#a78bfa';
+  const modal = document.getElementById('addAgentModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeAddAgentModal() {
+  const modal = document.getElementById('addAgentModal');
+  if (modal) modal.style.display = 'none';
+}
+function slugifyAgentId(raw) {
+  return String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-_]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+function saveNewAgent() {
+  const rawId = (document.getElementById('aaId') || {}).value || '';
+  const name = ((document.getElementById('aaName') || {}).value || '').trim();
+  const role = ((document.getElementById('aaRole') || {}).value || '').trim() || 'סוכן';
+  const icon = ((document.getElementById('aaIcon') || {}).value || '').trim() || '🤖';
+  const color = ((document.getElementById('aaColor') || {}).value || '#a78bfa');
+  let id = slugifyAgentId(rawId) || slugifyAgentId(name);
+  if (!id) {
+    // Hebrew-only names: generate a stable-ish slug
+    id = 'agent-' + Date.now().toString(36);
+  }
+  if (findAgent(id)) {
+    addSystemMsg('⚠️ כבר קיים סוכן עם המזהה ' + id);
+    return;
+  }
+  if (!name) {
+    addSystemMsg('⚠️ נדרש שם תצוגה');
+    return;
+  }
+  AGENTS_STORE.push({
+    id,
+    name,
+    role,
+    icon,
+    color,
+    talkDirect: false,
+    healthPath: '/health',
+    hint: `הודעות מגיעות עדיין ל-Hermes — הוא זה שמחליט אם ומה להעביר ל-${name}`
+  });
+  persistAgents();
+  renderAgentChips();
+  updateAgentsMetric();
+  closeAddAgentModal();
+  if (openWins.has('network')) drawNetwork();
+  addSystemMsg(`✅ הסוכן "${name}" נוסף לרשימה (תצוגה בלבד — שיחה דרך Hermes)`);
+}
 function addTask() {
   if (currentContext && currentContext !== 'כל הפרויקטים') {
     const p = findProject(currentContext);
@@ -3100,6 +3385,9 @@ function addTask() {
 }
 
 // ── INIT ──
+loadAgents();
+renderAgentChips();
+
 NOTES_STORE = loadNotes();
 try {
   const pins = JSON.parse(localStorage.getItem('hermes_sticky_pins_v1') || '[]');
@@ -3112,6 +3400,7 @@ renderAllProjectUI();
 renderNotesUI();
 renderStickyNotes();
 fetchProjectsFromHermes();
+fetchAgentsFromHermes();
 
 const hadLayout = restoreWinLayout();
 if (!hadLayout) {
